@@ -1,0 +1,9 @@
+.offBanner{
+    height: 480px;
+}
+
+@media only screen and (max-width: 800px) {
+    .offBanner{
+        height: auto;
+    }
+}

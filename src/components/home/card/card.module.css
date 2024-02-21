@@ -1,0 +1,22 @@
+.productcard .cardMainContent{
+    transition: all 0.5s ease;
+}
+
+.productcard:hover .cardMainContent{
+    transform: translateY(-40px);
+}
+.cardBtn{
+    transition: all 0.5s ease;
+    bottom: -40px;
+}
+.productcard:hover .cardBtn{
+    bottom: 0px;
+}
+@media only screen and (max-width: 1024px){
+    .productcard .cardMainContent{
+        transform: translateY(0px);
+    }
+    .cardBtn{
+        bottom: 0px;
+    }
+}

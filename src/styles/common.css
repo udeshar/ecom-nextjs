@@ -1,0 +1,24 @@
+.react-select__indicator-separator{
+    display: none;
+}
+.dark .select__indicator, .dark .react-select__single-value{
+    color: #fff !important;
+}
+.light .select__indicator, .light .react-select__single-value{
+    color: #000 !important;
+}
+.react-select__single-value{
+    font-size: 14px;
+}
+.react-select__control{
+    background-color: transparent !important;
+}
+.custom-input-select-wrapper .react-select__control, .custom-input-select-wrapper input{
+    border: none !important;
+}
+.carousel-slider, .slider-wrapper, .slider{
+    height: 100%;
+}
+.slide{
+    text-align: left !important;
+}
