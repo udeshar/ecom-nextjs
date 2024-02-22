@@ -16,10 +16,12 @@ import { PrismaClient, category, product } from "@prisma/client";
 interface Props {
   categories: category[];
   products: product[];
+  faeturedProducts: product[];
+  bestSeller: product[];
+  offered: product[];
 }
 
-export default function Home({categories, products} : Props) {
-  console.log(categories);
+export default function Home({categories, products, bestSeller, faeturedProducts, offered} : Props) {
   return (
     <Layout>
       <Container className={"my-5 mt-8"}>
@@ -27,16 +29,20 @@ export default function Home({categories, products} : Props) {
           <div
             className={"col-span-12 lg:col-span-8 bg-slate-100 dark:bg-slate-700 " + styles.offBanner}
           >
-            <Slider />
+            <Slider featured={faeturedProducts} />
           </div>
           <div className="col-span-12 lg:col-span-4 h-auto md:h-56 lg:h-auto">
             <div className="flex flex-row lg:flex-col justify-between h-full gap-4 sm:gap-5">
-              <OfferCard />
-              <OfferCard />
+              {
+                bestSeller && bestSeller[0] && <OfferCard product={bestSeller[0]} />
+              }
+              {
+                offered && offered[0] && <OfferCard product={offered[0]} />
+              }
             </div>
           </div>
         </div>
-        <ProductList products={products} />
+        <ProductList products={products} bestSeller={bestSeller} featured={faeturedProducts} offered={offered} />
         <ExploreCategory categories={categories} />
       </Container>
     </Layout>
@@ -46,11 +52,39 @@ export default function Home({categories, products} : Props) {
 export async function getStaticProps() {
   const prisma = new PrismaClient()
   const categories = await prisma.category.findMany()
-  const products = await prisma.product.findMany()
+
+  // get products with their categories
+  const products = await prisma.product.findMany({
+    include: {
+      category: true
+    }
+  })
+
+  const faeturedProducts = await prisma.product.findMany({
+    where: {
+      featured: true
+    }
+  })
+
+  const bestSeller = await prisma.product.findMany({
+    where: {
+      bestSeller: true
+    }
+  })
+
+  const offered = await prisma.product.findMany({
+    where: {
+      offered: true
+    }
+  })
+
   return {
     props: {
       categories : JSON.parse(JSON.stringify(categories)),
-      products : JSON.parse(JSON.stringify(products))
+      products : JSON.parse(JSON.stringify(products)),
+      faeturedProducts : JSON.parse(JSON.stringify(faeturedProducts)),
+      bestSeller : JSON.parse(JSON.stringify(bestSeller)),
+      offered : JSON.parse(JSON.stringify(offered))
     },
   };
 }

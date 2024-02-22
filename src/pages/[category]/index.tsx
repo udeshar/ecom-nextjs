@@ -7,12 +7,18 @@ import CustomInput from '@/components/common/custom-input/CustomInput'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import { BiSearch } from 'react-icons/bi'
 import { PrismaClient, product } from '@prisma/client'
+import { useRouter } from 'next/router'
 
-const index = ({products} : {products : product[]}) => {
+const Index = ({products} : {products : any}) => {
+
+    const router = useRouter();
+    const {category} = router.query;
+
+
   return (
     <Layout>
         <>
-        <BreadCrumd  />
+        <BreadCrumd firstTitle={category as string} secondTitle='' />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row mt-8 justify-between sm:items-center gap-5 sm:gap-0" >
                 <div className="flex items-center gap-3" >
@@ -40,14 +46,14 @@ const index = ({products} : {products : product[]}) => {
                     <button className="bg-blue-400 text-white px-3 py-2 rounded-md" ><BiSearch size={20} /></button>
                 </div>
             </div>
-            <CategoryProduct products={products} user='User' />
+            <CategoryProduct products={products} user='User' categoryName={category as string} />
         </div>
         </>
     </Layout>
   )
 }
 
-export default index
+export default Index
 
 export async function getStaticProps({params} : any) {
     const category = params.category;
@@ -66,6 +72,9 @@ export async function getStaticProps({params} : any) {
     const products = await prisma.product.findMany({
         where : {
             categoryId : categoryData?.id
+        },
+        include : {
+            category : true
         }
     })
     return {

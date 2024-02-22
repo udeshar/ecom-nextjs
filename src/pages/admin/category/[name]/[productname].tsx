@@ -12,6 +12,7 @@ import { HiX } from 'react-icons/hi';
 import { PrismaClient, category, product } from '@prisma/client'
 import { useRouter } from 'next/router'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
+import cookie from 'cookie';
 
 interface UpdateProductProps {
     categories: category[]
@@ -29,7 +30,10 @@ const UpdateProduct = ({product} : {product : product}) => {
         offer: product.offer?.toString() || undefined,
         availability: product.availability,
         description: product.description || undefined,
-        imagePath : product.imagePath
+        imagePath : product.imagePath,
+        featured: product.featured,
+        bestSeller: product.bestSeller,
+        offered: product.offered
     })
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +78,7 @@ const UpdateProduct = ({product} : {product : product}) => {
             return;
         }
         else{
-            console.log('Form Data : ', formData)
+            console.log('Form Data : ', productData)
             fetch('/api/product/'+ product.id, {
                 method: 'PATCH',
                 headers: {
@@ -88,7 +92,10 @@ const UpdateProduct = ({product} : {product : product}) => {
                     availability,
                     productDescription,
                     image : previewImage,
-                    imagePath : productData.imagePath
+                    imagePath : productData.imagePath,
+                    featuredProduct : productData.featured,
+                    bestSeller : productData.bestSeller,
+                    offered : productData.offered
                 })
             })
             .then(res => res.json())
@@ -228,6 +235,50 @@ const UpdateProduct = ({product} : {product : product}) => {
                             />
                         </div>
                     </div>
+
+                    <div className=" mt-6 mb-1" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Is Product Featured?"
+                                placeholder="Is Product Featured?"
+                                id='featuredProduct'
+                                name='featuredProduct'
+                                type='checkbox'
+                                className=''
+                                isChecked={productData.featured}
+                                onChange={(e) => {
+                                    console.log(e.target.checked)
+                                    setProductData({...productData, featured : e.target.checked})
+                                }}
+                            />
+                        </div>
+                        <div className="mb-1" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Is Product a Best Seller?"
+                                placeholder="Is product a best seller?"
+                                id='bestSeller'
+                                name='bestSeller'
+                                type='checkbox'
+                                className=''
+                                isChecked={productData.bestSeller}
+                                onChange={(e) => setProductData({...productData, bestSeller : e.target.checked})}
+                            />
+                        </div>
+                        <div className="" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Does product have discount?"
+                                placeholder="Does product have discount?"
+                                id='offers'
+                                name='offers'
+                                type='checkbox'
+                                className=''
+                                isChecked={productData.offered}
+                                onChange={(e) => setProductData({...productData, offered : e.target.checked})}
+                            />
+                        </div>
+
                     {previewImage &&
                         <div className="mt-3 relative inline-block" >
                             <Image src={previewImage as string} alt="Product Image" height={250} width={250} style={{objectFit : "contain"}} />
@@ -277,7 +328,8 @@ export async function getServerSideProps(context:any) {
           permanent: false,
         },
     }
-    const token = context.req.headers.cookie.split('=')[1];
+    const cookies = cookie.parse(context.req.headers.cookie || '');
+    const token = cookies.token;
     if(!token){
         return redr
     }

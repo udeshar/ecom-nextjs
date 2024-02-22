@@ -12,6 +12,7 @@ import { HiX } from 'react-icons/hi';
 import { PrismaClient, category } from '@prisma/client'
 import { useRouter } from 'next/router'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
+import cookie from 'cookie';
 
 interface AddProductProps {
     categories: category[]
@@ -58,6 +59,9 @@ const AddProduct = ({categories} : AddProductProps) => {
         const availability = formData.get('availability');
         const productDescription = formData.get('productDescription');
         const category = formData.get('category');
+        const featuredProduct = formData.get('featuredProduct');
+        const bestSeller = formData.get('bestSeller');
+        const offered = formData.get('offers');
 
         if (!productName || !productPrice || !offProduct || !availability || !productDescription || !category || !previewImage) {
             setError('All fields are required');
@@ -65,6 +69,7 @@ const AddProduct = ({categories} : AddProductProps) => {
         }
         else{
             console.log('Form Data : ', formData)
+            console.log(featuredProduct, bestSeller, offered)
             fetch('/api/product', {
                 method: 'POST',
                 headers: {
@@ -78,7 +83,10 @@ const AddProduct = ({categories} : AddProductProps) => {
                     availability,
                     productDescription,
                     category,
-                    image : previewImage
+                    image : previewImage,
+                    featuredProduct : featuredProduct != null ? true : false,
+                    bestSeller : bestSeller != null ? true : false,
+                    offered : offered != null ? true : false
                 })
             })
             .then(res => res.json())
@@ -203,6 +211,39 @@ const AddProduct = ({categories} : AddProductProps) => {
                             />
                         </div>
                     </div>
+                    <div className="mb-1" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Is Product Featured?"
+                                placeholder="Is Product Featured?"
+                                id='featuredProduct'
+                                name='featuredProduct'
+                                type='checkbox'
+                                className=''
+                            />
+                        </div>
+                        <div className="mb-1" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Is Product a Best Seller?"
+                                placeholder="Is product a best seller?"
+                                id='bestSeller'
+                                name='bestSeller'
+                                type='checkbox'
+                                className=''
+                            />
+                        </div>
+                        <div className="" >
+                            <CustomInput
+                                wrapperClass='flex gap-3'
+                                label="Does product have discount?"
+                                placeholder="Does product have discount?"
+                                id='offers'
+                                name='offers'
+                                type='checkbox'
+                                className=''
+                            />
+                        </div>
                     {previewImage &&
                         <div className="mt-3 relative inline-block" >
                             <Image src={previewImage as string} alt="Product Image" height={250} width={250} style={{objectFit : "contain"}} />
@@ -240,7 +281,8 @@ export async function getServerSideProps(context:any) {
           permanent: false,
         },
     }
-    const token = context.req.headers.cookie.split('=')[1];
+    const cookies = cookie.parse(context.req.headers.cookie || '');
+    const token = cookies.token;
     if(!token){
         return redr
     }

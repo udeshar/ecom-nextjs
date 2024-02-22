@@ -24,7 +24,10 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
                 offProduct,
                 availability,
                 productDescription,
-                category
+                category,
+                featuredProduct,
+                bestSeller,
+                offered
             } = req.body;
 
             const file = req.body.image;
@@ -54,7 +57,10 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
                         availability: availability,
                         description: productDescription,
                         imagePath: uploadedImage.secure_url,
-                        categoryId: category
+                        categoryId: category,
+                        featured: featuredProduct,
+                        bestSeller: bestSeller,
+                        offered: offered
                     }
                 })
                 res.status(201).json({message: "Product Created", ...categoryModel})

@@ -23,7 +23,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
   const [error, setError] = useState<string | null>(null);
 
   const handleProductClick = () => {
-    router.push(`/product/${product.id}`);
+    router.push(`/${categoryName}/${product.name}`);
   }
 
   const deleteHandler = () => {
@@ -69,7 +69,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
             edit={false}
           />
         </div>
-        <p className="text-sm text-gray-500">$ {product.price}</p>
+        <p className="text-sm text-gray-500">₹{product.price}</p>
       </div>
       <div className={"relative lg:absolute w-full flex justify-between my-2 lg:my-0 " + styles.cardBtn} >
         {

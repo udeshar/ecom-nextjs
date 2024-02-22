@@ -10,6 +10,7 @@ import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useRouter } from 'next/router'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
+import cookie from 'cookie';
 
 const AddCategory = () => {
 
@@ -159,7 +160,8 @@ export async function getServerSideProps(context:any) {
           permanent: false,
         },
     }
-    const token = context.req.headers.cookie.split('=')[1];
+    const cookies = cookie.parse(context.req.headers.cookie || '');
+    const token = cookies.token;
     if(!token){
         return redr
     }

@@ -20,6 +20,9 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
                 availability,
                 productDescription,
                 imagePath,
+                featuredProduct,
+                bestSeller,
+                offered
             } = req.body;
 
             const file = req.body.image;
@@ -54,6 +57,9 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
                             availability: availability,
                             description: productDescription,
                             imagePath: uploadedImage.secure_url,
+                            featured: featuredProduct,
+                            bestSeller: bestSeller,
+                            offered: offered
                         }
                     })
                     res.status(200).json({message: "Category Updated", ...productt})
@@ -71,6 +77,9 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
                             offer: parseInt(offProduct),
                             availability: availability,
                             description: productDescription,
+                            featured: featuredProduct,
+                            bestSeller: bestSeller,
+                            offered: offered
                         }
                     })
                     res.status(200).json({message: "Category Updated", ...productt})

@@ -52,7 +52,8 @@ export async function checkIfAdminExist(token: string){
 }
 
 export async function checkIfAdminExist2(token: string){
-    console.log('Check if admin exist')
+    // console.log('Check if admin exist')
+    // console.log(token)
     const prisma = new PrismaClient();
     // saperate bearer from token
     if(!token){
@@ -62,6 +63,7 @@ export async function checkIfAdminExist2(token: string){
     if (!tokenArray[1] || tokenArray[1] == 'null') {
         throw new CustomError('Token not found', 401);
     }
+    console.log(tokenArray[1], "______")
     const decoded = jwt.verify(tokenArray[1], process.env.JWT_SECRET);
     const user = await prisma.user.findUnique({
         where: {

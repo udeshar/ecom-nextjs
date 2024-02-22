@@ -11,6 +11,7 @@ import { PrismaClient, product } from '@prisma/client'
 import { Button } from 'flowbite-react'
 import Link from 'next/link'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
+import cookie from 'cookie';
 
 interface IAdminProps {
     products: product[]
@@ -78,7 +79,8 @@ export async function getServerSideProps(context:any){
           permanent: false,
         },
     }
-    const token = context.req.headers.cookie.split('=')[1];
+    const cookies = cookie.parse(context.req.headers.cookie || '');
+    const token = cookies.token;
     if(!token){
         return redr
     }

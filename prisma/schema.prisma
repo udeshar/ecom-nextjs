@@ -36,6 +36,9 @@ model product {
   imagePath   String?
   availability Availability
   offer       Float?
+  featured    Boolean @default(false)
+  bestSeller  Boolean @default(false)
+  offered     Boolean @default(false)
   categoryId  String
   category    category @relation(fields: [categoryId], references: [id])
   createdAt   DateTime @default(now())
