@@ -1,25 +1,24 @@
 import { useContext, createContext, FC, useState, useEffect } from "react";
 
-const CartContext = createContext({
+const WishlistContext = createContext({
     items : [],
     setItems : (items) => {},
-    addItem : (item) => {},
-    getCartItems : () => {},
-    updatecart : (item) => {},
-    removeItem : (item, qty) => {},
+    addIteminwish : (item) => {},
+    getWishlistItems : () => {},
+    deletewishlist : (item) => {},
 });
 
-export const useCartContext = () => {
-    return useContext(CartContext);
+export const useWishlistContext = () => {
+    return useContext(WishlistContext);
 };
 
-export const CartProvider = ({ children }) => {
+export const WishlistProvider = ({ children }) => {
 
     const [items, setItems] = useState([]);   
 
     const addItem = async (item) => {
         try {
-            const response = await fetch('/api/cart', {
+            const response = await fetch('/api/wishlist', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,15 +28,15 @@ export const CartProvider = ({ children }) => {
             const data = await response.json();
             console.log(data);
             // setItems(data);
-            getCartItems();
+            getWishlistItems();
         } catch (error) {
             console.error('Error:', error);
         }
     };
 
-    const getCartItems = async () => {
+    const getWishlistItems = async () => {
         try {
-            const response = await fetch('/api/cart', {
+            const response = await fetch('/api/wishlist', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,38 +50,18 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    const removeItem = async (item, qty) => {
+    const deletewishlist = async (item) => {
         try {
-            fetch('/api/cart/'+item.id, {
-                method: 'PATCH',
+            fetch('/api/wishlist/'+item.id, {
+                method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({quantity : qty}),
             })
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                getCartItems();
-            })
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    const updatecart = async (item) => {
-        try {
-            fetch('/api/cart/'+item.id, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({quantity : item.quantity}),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                getCartItems();
+                getWishlistItems();
             })
         } catch (error) {
             console.error('Error:', error);
@@ -92,24 +71,23 @@ export const CartProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         // if(token){
-            getCartItems();
+            getWishlistItems();
         // }
     }, []);
 
     const values = {
         items : items,
         setItems : setItems,
-        addItem : addItem,
-        getCartItems : getCartItems,
-        updatecart : updatecart,
-        removeItem : removeItem,
+        addIteminwish : addItem,
+        getWishlistItems : getWishlistItems,
+        deletewishlist : deletewishlist,
     };
 
     return (
-        <CartContext.Provider value={values}>
+        <WishlistContext.Provider value={values}>
             {children}
-        </CartContext.Provider>
+        </WishlistContext.Provider>
     )
 };
 
-export default CartContext;
+export default WishlistContext;

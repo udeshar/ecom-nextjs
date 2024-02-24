@@ -6,11 +6,13 @@ import ToggleTheme from "../theme/ToggleTheme";
 import Link from "next/link";
 import { useUserContext } from "@/context/userContext";
 import { useCartContext } from "@/context/cartContext"; 
+import { useWishlistContext } from "@/context/wishlistContext";
 
 
 const Navbar: React.FC = () => {
     const {user, logout, getUser} = useUserContext();
     const { items, getCartItems } = useCartContext();
+    const { items : wishItems } = useWishlistContext();
 
     // useEffect(() => {
     //     // getUser();
@@ -24,7 +26,8 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center flex-1">
                         <div className="flex-shrink-0 dark:text-white font-bold text-lg">
-                            MARKETO
+                            <Link href="/" >MARKETO</Link>
+                            {/* MARKETO */}
                         </div>
                     </div>
                     <div className="flex flex-1 justify-center" >
@@ -35,7 +38,10 @@ const Navbar: React.FC = () => {
                             {
                                 user && (
                                     <>
-                                        <IoMdHeartEmpty size={22} className="dark:text-white" />
+                                        <Link href="/wishlist" className="hover:text-blue-800 m-0 relative" >
+                                            <IoMdHeartEmpty size={22} className="dark:text-white" />
+                                            {wishItems.length > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1 absolute bottom-1/2 left-1/2" >{wishItems.length}</span>}
+                                        </Link>
                                         <Link href="/cart" className="hover:text-blue-800 m-0 relative">
                                             <MdOutlineShoppingCart size={22} className="dark:text-white">
                                             </MdOutlineShoppingCart>

@@ -8,11 +8,18 @@ import OverallRating from '@/components/product/OverallRating';
 import { PrismaClient, product } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCartContext } from '@/context/cartContext';
+import { useWishlistContext } from '@/context/wishlistContext';
 
 const ProductCard = ({product} : {product : product}) => {
     const router = useRouter();
-    const {addItem} = useCartContext();
+    const {addItem, items} = useCartContext();
+    const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
+
     const {category, product: productName} = router.query;
+
+    const isItemExist = items.find((item : any) => item.product.id === product.id);
+    const data:any = wishlistItems.filter((item : any) => item.product.id === product.id)
+
   return (
     <Layout>
         <>
@@ -49,8 +56,22 @@ const ProductCard = ({product} : {product : product}) => {
                             <p className="text-green-600 font-medium ml-2" >{product.availability}</p>
                         </div>
                         {/* Add to cart */}
-                        <div className="mt-5" >
-                            <button onClick={()=> addItem(product.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
+                        <div className="flex gap-5 items-center" >
+                        {
+                            isItemExist && <div className="mt-5" >
+                                <button onClick={()=> router.push('/cart')} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Go to cart</button>
+                            </div> || <div className="mt-5" >
+                                <button onClick={()=> addItem(product.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
+                            </div>
+                        }
+                        {
+                            data && data.length > 0 && data[0].product.id === product.id &&
+                            <div className="mt-5" >
+                                <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button>
+                            </div> || <div className="mt-5" >
+                                <button onClick={()=> addIteminwish(product.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button>
+                            </div>
+                        }
                         </div>
                     </div>
                 </div>

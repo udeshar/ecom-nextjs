@@ -4,13 +4,14 @@ import ReactStars from "react-rating-stars-component";
 import styles from "./card.module.css";
 import BtnUnderline from "@/components/common/custom-button/BtnUnderline";
 import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
-import { product } from "@prisma/client";
+import { cart, cartItems, product } from "@prisma/client";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useCartContext } from "@/context/cartContext";
+import { useWishlistContext } from "@/context/wishlistContext";
 
 const ProductCard = ({product, user, categoryName} : {product : product, user : "Admin" | "User", categoryName? : string}) => {
 
@@ -18,7 +19,8 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
   const ratingChanged = (newRating: any) => {
     console.log(newRating);
   };
-  const { addItem } = useCartContext();
+  const { addItem, items : cartItems, removeItem } = useCartContext();
+  const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
 
   const [isFav, setIsFav] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +48,11 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
             router.back();
         }
     })
-}
+  }
+
+  const data:any = wishlistItems.filter((item : any) => item.product.id === product.id)
+  const data2:any = cartItems.filter((item : any) => item.product.id === product.id)
+  // console.log(data, "*************************")
 
   return (
     <div className={"relative overflow-hidden product-card transition mt-1 sm:mt-3 col-span-2 sm:col-span-2 md:col-span-2 lg:col-span-1 " + styles.productcard} >
@@ -76,8 +82,30 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
         {
           user === "User" &&
           <>
+            {
+              data2 && data2.length > 0 && data2[0].product.id === product.id && 
+              <BtnUnderline className="" onClick={()=> removeItem(data2[0], 0)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Remove from cart</p></div></BtnUnderline> ||
               <BtnUnderline className="" onClick={()=> addItem(product.id)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
-              {isFav ? <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>setIsFav(!isFav)} /> : <IoHeartOutline size={22} className={"cursor-pointer text-red-400"} onClick={()=>setIsFav(!isFav)} />}
+            }
+              {/* {isFav ? <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
+                console.log(product.id);
+                addIteminwish(product.id);
+                // setIsFav(!isFav);
+              }} /> : <IoHeartOutline size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
+                console.log(product.id);
+                addIteminwish(product.id);
+                // setIsFav(!isFav);
+              }} />} */}
+              {
+                data && data.length > 0 && data[0].product.id === product.id &&
+                <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
+                  console.log(data[0].id);
+                  deletewishlist(data[0]);
+                }} /> ||
+                <IoHeartOutline size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
+                  addIteminwish(product.id);
+                }} />
+              }
           </>
           ||
           <>

@@ -46,7 +46,7 @@ model product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   cartItems   cartItems[]
-  wishlist    wishlist[]
+  wishlistItems wishlistItems[]
 }
 
 model cart {
@@ -73,10 +73,19 @@ model wishlist {
   id        String @id
   userId    String @unique
   user      User   @relation(fields: [userId], references: [id])
-  productId String
-  product   product @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  wishlistItems wishlistItems[]
+}
+
+model wishlistItems {
+  id          String @id
+  wishlistId  String
+  wishlist    wishlist @relation(fields: [wishlistId], references: [id])
+  productId   String
+  product     product @relation(fields: [productId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // Define an enum for availability
