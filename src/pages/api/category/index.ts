@@ -1,10 +1,11 @@
 import { CustomError } from "@/helpers/CustomError";
-import { checkIfAdminExist } from "@/helpers/dbUtils";
+import { checkIfAdminExist, checkIfAdminExist2 } from "@/helpers/dbUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 // import cloudinary from 'cloudinary';
 import cloudinary from "@/helpers/cloudinaryConfig";
 import { v4 as uuidv4 } from 'uuid';
+import cookie from 'cookie';
 
 // cloudinary.v2.config({
 //     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,7 +17,8 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
     console.log(req.method)
     if(req.method === 'POST'){
         try {
-            await checkIfAdminExist(req.headers.authorization!);
+            const cookies = cookie.parse(req.headers.cookie || '');
+            await checkIfAdminExist2(cookies.token);
             const name = req.body.name;
             const description = req.body.description;
             const file = req.body.image;
@@ -53,7 +55,8 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
 
     if(req.method === 'PUT'){
         try {
-            await checkIfAdminExist(req.headers.authorization!);
+            const cookies = cookie.parse(req.headers.cookie || '');
+            await checkIfAdminExist2(cookies.token);
             const id = req.body.id;
             const name = req.body.name;
             const description = req.body.description;

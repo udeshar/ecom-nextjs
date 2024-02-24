@@ -10,7 +10,7 @@ import { FaRegEdit } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
-
+import { useCartContext } from "@/context/cartContext";
 
 const ProductCard = ({product, user, categoryName} : {product : product, user : "Admin" | "User", categoryName? : string}) => {
 
@@ -18,6 +18,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
   const ratingChanged = (newRating: any) => {
     console.log(newRating);
   };
+  const { addItem } = useCartContext();
 
   const [isFav, setIsFav] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +76,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
         {
           user === "User" &&
           <>
-              <BtnUnderline className="" onClick={()=>{}} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
+              <BtnUnderline className="" onClick={()=> addItem(product.id)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
               {isFav ? <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>setIsFav(!isFav)} /> : <IoHeartOutline size={22} className={"cursor-pointer text-red-400"} onClick={()=>setIsFav(!isFav)} />}
           </>
           ||

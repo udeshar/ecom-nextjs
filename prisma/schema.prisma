@@ -16,6 +16,8 @@ model User {
   password String  @db.VarChar(60)
   role    Role?     @default(USER)
   createdAt DateTime @default(now())
+  cart    cart?
+  wishlist wishlist?
 }
 
 model category {
@@ -43,6 +45,38 @@ model product {
   category    category @relation(fields: [categoryId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  cartItems   cartItems[]
+  wishlist    wishlist[]
+}
+
+model cart {
+  id        String @id
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cartItems cartItems[]
+}
+
+model cartItems {
+  id        String @id
+  cartId    String
+  cart      cart   @relation(fields: [cartId], references: [id])
+  productId String
+  product   product @relation(fields: [productId], references: [id])
+  quantity  Int @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model wishlist {
+  id        String @id
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+  productId String
+  product   product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // Define an enum for availability

@@ -1,11 +1,11 @@
 import { CustomError } from "@/helpers/CustomError";
-import { checkIfAdminExist } from "@/helpers/dbUtils";
+import { checkIfAdminExist, checkIfAdminExist2 } from "@/helpers/dbUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 // import cloudinary from 'cloudinary';
 import { v4 as uuidv4 } from 'uuid';
 import cloudinary from "@/helpers/cloudinaryConfig";
-import { off } from "process";
+import cookie from 'cookie';
 
 // cloudinary.v2.config({
 //     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -17,7 +17,8 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
     console.log(req.method)
     if(req.method === 'POST'){
         try {
-            await checkIfAdminExist(req.headers.authorization!);
+            const cookies = cookie.parse(req.headers.cookie || '');
+            await checkIfAdminExist2(cookies.token);
             const { 
                 productName, 
                 productPrice,

@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { checkIfUserExist } from "@/helpers/dbUtils";
+import { checkIfUserExist, checkIfUserExist2 } from "@/helpers/dbUtils";
+import cookie from 'cookie';
 // import { cookies } from "next/headers";
 
 async function handler(req : NextApiRequest, res : NextApiResponse){
     if (req.method === "POST") {
         try {
-            await checkIfUserExist(req.headers.authorization!);
+            const cookies = cookie.parse(req.headers.cookie || '');
+            await checkIfUserExist2(cookies.token);
             // cookies().delete('token');
             res.setHeader('Set-Cookie', `token=; path=/; httpOnly;`)
             res.status(201).json({message : "Logged out successfully"})

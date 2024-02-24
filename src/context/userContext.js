@@ -85,9 +85,9 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        // if(token){
+        if(token){
             getUser();
-        // }
+        }
     }, []);
 
     const values = {

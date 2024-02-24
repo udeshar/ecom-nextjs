@@ -5,18 +5,16 @@ import SelectInputBtn from "../custom-input/SelectInputBtn";
 import ToggleTheme from "../theme/ToggleTheme";
 import Link from "next/link";
 import { useUserContext } from "@/context/userContext";
+import { useCartContext } from "@/context/cartContext"; 
 
 
 const Navbar: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const {user, logout} = useUserContext();
-
-    const toggleMenu = () => {
-        setIsOpen(!isOpen);
-    };
+    const {user, logout, getUser} = useUserContext();
+    const { items, getCartItems } = useCartContext();
 
     // useEffect(() => {
-    //     getUser();
+    //     // getUser();
+    //     // getCartItems();
     // }, [])
     
 
@@ -29,41 +27,19 @@ const Navbar: React.FC = () => {
                             MARKETO
                         </div>
                     </div>
-                    <div className="block md:hidden">
-                        <button
-                            onClick={toggleMenu}
-                            className="text-gray-300 hover:text-white focus:outline-none"
-                        >
-                            <span>&#9776;</span>
-                        </button>
-                    </div>
                     <div className="flex flex-1 justify-center" >
-                        {/* <CustomInput 
-                            id="search"
-                            name="search"
-                            type="text"
-                            value=""
-                            className=""
-                            placeholder="search"
-                        /> */}
-                        {/* <CustomSelect 
-                            options={[
-                                { value: 'chocolate', label: 'Chocolate' },
-                                { value: 'strawberry', label: 'Strawberry' },
-                                { value: 'vanilla', label: 'Vanilla' }
-                            ]}
-                        /> */}
-                        {/* <SelectInputBtn /> */}
                     </div>
-                    <div className="hidden md:block flex-1">
+                    <div className="block flex-1">
                         <div className="flex items-center space-x-4 justify-end gap-3">
                             <ToggleTheme />
                             {
                                 user && (
                                     <>
                                         <IoMdHeartEmpty size={22} className="dark:text-white" />
-                                        <Link href="/cart" className="hover:text-blue-800 m-0">
-                                            <MdOutlineShoppingCart size={22} className="dark:text-white" />
+                                        <Link href="/cart" className="hover:text-blue-800 m-0 relative">
+                                            <MdOutlineShoppingCart size={22} className="dark:text-white">
+                                            </MdOutlineShoppingCart>
+                                            {items.length > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1 absolute bottom-1/2 left-1/2" >{items.length}</span>}
                                         </Link>
                                         {/* logout */}
                                         <button onClick={()=>logout(()=>{})} className="text-blue-500 hover:text-blue-800 m-0">
@@ -85,25 +61,6 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </div>
-            {/* Responsive Menu */}
-            {isOpen && (
-                <div className="md:hidden">
-                    <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                        <a href="#" className="text-gray-300 hover:text-white">
-                            Home
-                        </a>
-                        <a href="#" className="text-gray-300 hover:text-white">
-                            About
-                        </a>
-                        <a href="#" className="text-gray-300 hover:text-white">
-                            Services
-                        </a>
-                        <a href="#" className="text-gray-300 hover:text-white">
-                            Contact
-                        </a>
-                    </div>
-                </div>
-            )}
         </nav>
     );
 };

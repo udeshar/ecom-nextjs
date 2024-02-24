@@ -11,15 +11,36 @@ export const useAppContext = () => {
 
 export const AppProvider = ({ children }) => {
 
-    const [theme, setThemee] = useState("light");
+    const getThemeFromLocalStorage = () => {
+        if(typeof window === 'object'){
+            const themee = localStorage.getItem('theme');
+            if (themee) {
+                return themee;
+            } else {
+                return 'light';
+            }
+        } else {
+            return 'light';
+        }
+    }
+
+    const [theme, setThemee] = useState('light');
 
     const values = {
         theme,
         setTheme : (()=>{
             setThemee((prev)=> prev == "dark" ? "light" : "dark" )
+            localStorage.setItem('theme', theme  == "light" ? "dark" : "light");
             document.getElementsByTagName("html")[0].classList.toggle(theme);
         })
     };
+    
+
+    useEffect(() => {
+      const themee = getThemeFromLocalStorage();
+        setThemee(themee);
+    }, [])
+    
     
 
     useEffect(()=>{

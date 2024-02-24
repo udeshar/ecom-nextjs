@@ -45,7 +45,7 @@ const Signup = () => {
                     // }
                     // else {
                     //     alert(data.message)
-                    //     router.push("/login")
+                        router.push("/login")
                     // }
                 }
             })

@@ -1,8 +1,9 @@
 import { CustomError } from "@/helpers/CustomError";
-import { checkIfAdminExist } from "@/helpers/dbUtils";
+import { checkIfAdminExist, checkIfAdminExist2 } from "@/helpers/dbUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { PrismaClient } from "@prisma/client";
 import cloudinary from "@/helpers/cloudinaryConfig";
+import cookie from 'cookie';
 
 
 export default async function handler(req: NextApiRequest, res : NextApiResponse){
@@ -10,7 +11,8 @@ export default async function handler(req: NextApiRequest, res : NextApiResponse
 
     if(req.method === 'PATCH'){
         try {
-            await checkIfAdminExist(req.headers.authorization!);
+            const cookies = cookie.parse(req.headers.cookie || '');
+            await checkIfAdminExist2(cookies.token);
 
             const id = req.query.productid as string;
             const { 

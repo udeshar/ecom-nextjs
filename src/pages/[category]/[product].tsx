@@ -7,9 +7,11 @@ import Review from '@/components/common/review/Review';
 import OverallRating from '@/components/product/OverallRating';
 import { PrismaClient, product } from '@prisma/client';
 import { useRouter } from 'next/router';
+import { useCartContext } from '@/context/cartContext';
 
 const ProductCard = ({product} : {product : product}) => {
     const router = useRouter();
+    const {addItem} = useCartContext();
     const {category, product: productName} = router.query;
   return (
     <Layout>
@@ -48,7 +50,7 @@ const ProductCard = ({product} : {product : product}) => {
                         </div>
                         {/* Add to cart */}
                         <div className="mt-5" >
-                            <button className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
+                            <button onClick={()=> addItem(product.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
                         </div>
                     </div>
                 </div>

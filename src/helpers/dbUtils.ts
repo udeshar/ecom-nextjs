@@ -23,6 +23,29 @@ export async function checkIfUserExist(token: string){
     return user;
 }
 
+export async function checkIfUserExist2(token: string){
+    const prisma = new PrismaClient();
+    // saperate bearer from token
+    if(!token){
+        throw new CustomError('Token not found', 401);
+    }
+    const tokenArray = token.split(' ');
+    if (!tokenArray[1] || tokenArray[1] == 'null') {
+        throw new CustomError('Token not found', 401);
+    }
+    const decoded = jwt.verify(tokenArray[1], process.env.JWT_SECRET);
+    const user = await prisma.user.findUnique({
+        where: {
+            id: decoded.id,
+        },
+    });
+    await prisma.$disconnect();
+    if (!user) {
+        throw new CustomError('User not found', 404);
+    }
+    return user;
+}
+
 export async function checkIfAdminExist(token: string){
     console.log('Check if admin exist')
     const prisma = new PrismaClient();
