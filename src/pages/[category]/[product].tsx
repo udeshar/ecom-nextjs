@@ -17,8 +17,8 @@ const ProductCard = ({product} : {product : product}) => {
 
     const {category, product: productName} = router.query;
 
-    const isItemExist = items.find((item : any) => item.product.id === product.id);
-    const data:any = wishlistItems.filter((item : any) => item.product.id === product.id)
+    const isItemExist = items?.find((item : any) => item.product.id === product.id);
+    const data:any = wishlistItems?.filter((item : any) => item.product.id === product.id)
 
   return (
     <Layout>

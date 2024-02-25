@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useUserContext } from "@/context/userContext";
 import { useCartContext } from "@/context/cartContext"; 
 import { useWishlistContext } from "@/context/wishlistContext";
+import { useRouter } from "next/router";
 
 
 const Navbar: React.FC = () => {
@@ -14,6 +15,7 @@ const Navbar: React.FC = () => {
     const { items, getCartItems } = useCartContext();
     const { items : wishItems } = useWishlistContext();
 
+    const router = useRouter();
     // useEffect(() => {
     //     // getUser();
     //     // getCartItems();
@@ -48,7 +50,7 @@ const Navbar: React.FC = () => {
                                             {items.length > 0 && <span className="bg-red-500 text-white text-xs rounded-full px-1 absolute bottom-1/2 left-1/2" >{items.length}</span>}
                                         </Link>
                                         {/* logout */}
-                                        <button onClick={()=>logout(()=>{})} className="text-blue-500 hover:text-blue-800 m-0">
+                                        <button onClick={()=>logout(()=>{ router.replace('/login') })} className="text-blue-500 hover:text-blue-800 m-0">
                                             Logout
                                         </button>
                                     </>

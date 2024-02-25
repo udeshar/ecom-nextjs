@@ -19,6 +19,10 @@ export const CartProvider = ({ children }) => {
 
     const addItem = async (item) => {
         try {
+            if(!localStorage.getItem('token')){
+                alert('Please login to add item in wishlist');
+                return;
+            }
             const response = await fetch('/api/cart', {
                 method: 'POST',
                 headers: {
@@ -91,9 +95,9 @@ export const CartProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        // if(token){
+        if(token){
             getCartItems();
-        // }
+        }
     }, []);
 
     const values = {

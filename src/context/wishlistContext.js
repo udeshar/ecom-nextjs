@@ -18,6 +18,10 @@ export const WishlistProvider = ({ children }) => {
 
     const addItem = async (item) => {
         try {
+            if(!localStorage.getItem('token')){
+                alert('Please login to add item in wishlist');
+                return;
+            }
             const response = await fetch('/api/wishlist', {
                 method: 'POST',
                 headers: {
@@ -70,9 +74,9 @@ export const WishlistProvider = ({ children }) => {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        // if(token){
+        if(token){
             getWishlistItems();
-        // }
+        }
     }, []);
 
     const values = {

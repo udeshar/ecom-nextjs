@@ -4,11 +4,15 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layoutv2 from '@/components/layout/Layoutv2';
 import { useUserContext } from '@/context/userContext';
+import { useCartContext } from '@/context/cartContext';
+import { useWishlistContext } from '@/context/wishlistContext';
 
 const Login = () => {
 
     const router = useRouter()
     const {login} = useUserContext();
+    const { getCartItems } = useCartContext();
+    const { getWishlistItems } = useWishlistContext();
     const [error, setError] = useState("");
 
     const loginHandler = async (e: FormEvent) => {
@@ -23,8 +27,11 @@ const Login = () => {
             (user:any)=>{
                 if(user.role === "ADMIN") 
                     router.push("/admin")
-                else
+                else{
+                    getCartItems()
+                    getWishlistItems()
                     router.push("/")
+                }
             },
             (error:any)=>{
                 setError(error)
