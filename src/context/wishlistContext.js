@@ -48,7 +48,8 @@ export const WishlistProvider = ({ children }) => {
             });
             const data = await response.json();
             console.log(data);
-            setItems(data);
+            if(!data.error)
+                setItems(data);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -75,6 +76,7 @@ export const WishlistProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token){
+            console.log('token', token);
             getWishlistItems();
         }
     }, []);

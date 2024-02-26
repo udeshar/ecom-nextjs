@@ -103,3 +103,29 @@ export async function checkIfAdminExist2(token: string){
     return user;
 }
 
+
+export async function rateProduct(productid : string){
+    const prisma = new PrismaClient();
+
+    const reviews = await prisma.review.findMany({
+        where: {
+            productId: productid
+        }
+    });
+
+    const totalRatinglength = reviews.length;
+    const avgRating = reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalRatinglength;
+
+    // save avgrating in products
+    await prisma.product.update({
+        where: {
+            id: productid
+        },
+        data: {
+            rating: avgRating
+        }
+    });
+
+    prisma.$disconnect();
+    return avgRating;
+}

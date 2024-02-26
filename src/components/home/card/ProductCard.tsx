@@ -52,7 +52,6 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
 
   const data:any = wishlistItems.filter((item : any) => item.product.id === product.id)
   const data2:any = cartItems.filter((item : any) => item.product.id === product.id)
-  // console.log(data, "*************************")
 
   return (
     <div className={"relative overflow-hidden product-card transition mt-1 sm:mt-3 col-span-2 sm:col-span-2 md:col-span-2 lg:col-span-1 " + styles.productcard} >
@@ -69,7 +68,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
           <h2 className="font-bold text-sm sm:text-md ">{product.name}</h2>
           <ReactStars
             count={5}
-            value={3}
+            value={product.rating}
             onChange={ratingChanged}
             size={18}
             activeColor="#ffd700"

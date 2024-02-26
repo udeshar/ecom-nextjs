@@ -1,24 +1,58 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import Layout from '@/components/layout/Layout'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import Image from 'next/image'
 import ReactStars from "react-rating-stars-component";
 import Review from '@/components/common/review/Review';
 import OverallRating from '@/components/product/OverallRating';
-import { PrismaClient, product } from '@prisma/client';
+import { PrismaClient, User, product } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCartContext } from '@/context/cartContext';
 import { useWishlistContext } from '@/context/wishlistContext';
+import { useUserContext } from '@/context/userContext';
+import AddReview from '@/components/product/AddReview';
 
-const ProductCard = ({product} : {product : product}) => {
+const ProductCard = ({product, reviewsData} : {product : product, reviewsData : any}) => {
     const router = useRouter();
     const {addItem, items} = useCartContext();
     const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
-
+    const {user} : {user : User | null} = useUserContext();
     const {category, product: productName} = router.query;
+    const [reviews, setReviews] = useState<any>(reviewsData || []);
+    const [alredyReviewed, setAlredyReviewed] = useState<boolean>(false);
 
     const isItemExist = items?.find((item : any) => item.product.id === product.id);
     const data:any = wishlistItems?.filter((item : any) => item.product.id === product.id)
+
+    const getReviews = async  () => {
+        fetch(`/api/product/${product.id}/review`,{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            setReviews(data);
+        })
+        .catch(err => console.log(err))
+    }
+
+    useEffect(() => {
+        if(user){
+            const alredyReviewed = reviews.some((review : any) => {
+                if(review.userId == (user as any).id){
+                    console.log(review.userId, (user as any).id);
+                    return true;
+                }
+                console.log(review.userId, (user as any).id);
+                return false;
+            })
+            console.log(alredyReviewed);
+            setAlredyReviewed(alredyReviewed);
+        }
+    }, [user, reviews])
 
   return (
     <Layout>
@@ -36,7 +70,7 @@ const ProductCard = ({product} : {product : product}) => {
                         <div className="flex items-center gap-3 mt-3" >
                            <ReactStars
                                 count={5}
-                                value={3}
+                                value={product.rating}
                                 onChange={()=>{}}
                                 size={25}
                                 activeColor="#ffd700"
@@ -78,16 +112,26 @@ const ProductCard = ({product} : {product : product}) => {
                 <div>
                     {/* Reviews */}
                     <div className="mt-10" >
-                        <h1 className="font-medium text-2xl" >Reviews</h1>
+                        {
+                            user && (
+                                !alredyReviewed &&
+                                <>
+                                    <h1 className="font-medium text-2xl" >Reviews</h1>
+                                    <AddReview productid={product.id} callBack={getReviews} /> 
+                                </>
+                            )
+                        }
+                        <h3 className="font-medium text-xl mt-10" >All Reviews</h3>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-8 my-5" >
                             <div className="col-span-3 order-last md:order-first" >
-                                <Review />
-                                <Review />
-                                <Review />
-                                
+                                {
+                                    reviews && reviews.length > 0 && reviews.map((review : any, index : number) => (
+                                        <Review key={index} review={review} />
+                                    )) || <p className="text-gray-500 text-sm" >No reviews yet</p>
+                                }
                             </div>
                             <div className="col-span-2 mb-4 md:mb-0" >
-                                <OverallRating />
+                                <OverallRating reviews={reviews} />
                             </div>
                         </div>
                     </div>
@@ -113,11 +157,22 @@ export async function getStaticProps({params} : any) {
         }
     });
 
+    const reviews = await prisma.review.findMany({
+        where: {
+            productId: productData?.id
+        },
+        include: {
+            user: true
+        }
+    });
+
+    console.log(reviews);
     console.log(productData);
 
     return {
         props: {
-            product : JSON.parse(JSON.stringify(productData))
+            product : JSON.parse(JSON.stringify(productData)),
+            reviewsData : JSON.parse(JSON.stringify(reviews))
         },
     }
 }

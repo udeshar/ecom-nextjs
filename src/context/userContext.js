@@ -75,7 +75,7 @@ export const UserProvider = ({ children }) => {
                 if(data?.error){
                     logout(()=>{});
                 } else{
-                    setUser(data);
+                    setUser(data.user);
                 }
             })
         } catch (error) {
