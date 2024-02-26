@@ -66,11 +66,11 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                         </div>
                     </div>
                     <div className='col-span-3' >
-                        <h1 className="text-xl font-medium" >{product.name}</h1>
+                        <h1 className="text-xl font-medium" >{product?.name}</h1>
                         <div className="flex items-center gap-3 mt-3" >
                            <ReactStars
                                 count={5}
-                                value={product.rating}
+                                value={product?.rating}
                                 onChange={()=>{}}
                                 size={25}
                                 activeColor="#ffd700"
@@ -79,15 +79,15 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                             <p className="text-gray-500 text-sm my-3" >( 44 reviews )</p>
                         </div>
                         <h3 className="font-medium text-xl mt-3" >Description</h3>
-                        <p className="text-gray-500 text-sm font-light mt-4" >{product.description}</p>
-                        <p className="font-bold text-xl mt-4" >₹ {product.price}</p>
+                        <p className="text-gray-500 text-sm font-light mt-4" >{product?.description}</p>
+                        <p className="font-bold text-xl mt-4" >₹ {product?.price}</p>
                         <div className="flex items-center mt-3" >
                             <p className="text-slate-400" >Offer :</p>
-                            <p className="text-blue-600 font-medium ml-2" >{product.offer}% Cashback</p>
+                            <p className="text-blue-600 font-medium ml-2" >{product?.offer}% Cashback</p>
                         </div>
                         <div className="flex items-center mt-1" >
                             <p className="text-slate-400" >Available :</p>
-                            <p className="text-green-600 font-medium ml-2" >{product.availability}</p>
+                            <p className="text-green-600 font-medium ml-2" >{product?.availability}</p>
                         </div>
                         {/* Add to cart */}
                         <div className="flex gap-5 items-center" >
@@ -95,15 +95,15 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                             isItemExist && <div className="mt-5" >
                                 <button onClick={()=> router.push('/cart')} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Go to cart</button>
                             </div> || <div className="mt-5" >
-                                <button onClick={()=> addItem(product.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
+                                <button onClick={()=> addItem(product?.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
                             </div>
                         }
                         {
-                            data && data.length > 0 && data[0].product.id === product.id &&
+                            data && data.length > 0 && data[0].product.id === product?.id &&
                             <div className="mt-5" >
                                 <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button>
                             </div> || <div className="mt-5" >
-                                <button onClick={()=> addIteminwish(product.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button>
+                                <button onClick={()=> addIteminwish(product?.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button>
                             </div>
                         }
                         </div>
