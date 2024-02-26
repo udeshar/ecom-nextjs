@@ -14,6 +14,8 @@ const SelectInputBtn = () => {
             { value: "vanilla", label: "Vanilla" },
           ]}
           className="w-full"
+          id="select"
+          name="select"
         />
       </div>
       <div>
