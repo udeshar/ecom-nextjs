@@ -62,7 +62,7 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-4 my-5" >
                     <div className='col-span-2 h-96 md:h-auto bg-slate-100 dark:bg-slate-700 p-10 rounded-sm' >
                         <div className='h-full relative' >
-                            <Image src={product.imagePath!} alt="phone" fill={true} style={{objectFit : "contain"}}  />
+                            <Image src={product?.imagePath || '/assets/images/headphone.png'} alt="phone" fill={true} style={{objectFit : "contain"}}  />
                         </div>
                     </div>
                     <div className='col-span-3' >
@@ -148,8 +148,6 @@ export async function getStaticProps({params} : any) {
 
     const product = params.product;
 
-    console.log(product);
-
     const prisma = new PrismaClient();
     const productData = await prisma.product.findUnique({
         where: {
@@ -165,9 +163,6 @@ export async function getStaticProps({params} : any) {
             user: true
         }
     });
-
-    console.log(reviews);
-    console.log(productData);
 
     return {
         props: {
