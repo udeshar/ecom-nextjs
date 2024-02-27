@@ -55,7 +55,7 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
 
   return (
     <div className={"relative overflow-hidden product-card transition mt-1 sm:mt-3 col-span-2 sm:col-span-2 md:col-span-2 lg:col-span-1 " + styles.productcard} >
-      <div className={"flex flex-col justify-center " + styles.cardMainContent}>
+      <div onClick={()=> user == 'User' ?  handleProductClick() : null } className={"flex flex-col justify-center " + styles.cardMainContent}>
         <div className={"bg-slate-100 dark:bg-slate-700 rounded relative h-40 sm:h-60 md:h-80 w-full " + styles.imageWrap}>
           <Image
             src={product.imagePath ? product.imagePath : "/assets/images/headphone.png"}
