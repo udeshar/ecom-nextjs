@@ -25,24 +25,6 @@ const Slider = ({featured} : any) => {
           )
         })
       }
-      {/* <div className="h-full" >
-        <OffBanner />
-      </div>
-      <div className="h-full">
-        <OffBanner />
-      </div>
-      <div className="h-full">
-        <OffBanner />
-      </div>
-      <div className="h-full">
-        <OffBanner />
-      </div>
-      <div className="h-full">
-        <OffBanner />
-      </div>
-      <div className="h-full">
-        <OffBanner />
-      </div> */}
     </Carousel>
   );
 };

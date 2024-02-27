@@ -27,7 +27,11 @@ export default async function handler(req : NextApiRequest, res : NextApiRespons
                     wishlistId : wishlist.id
                 },
                 include: {
-                    product: true
+                    product: {
+                        include: {
+                            category: true
+                        }
+                    }
                 }
             })
             return res.status(200).json(wishlistItems);

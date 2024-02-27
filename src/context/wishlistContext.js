@@ -1,4 +1,5 @@
 import { useContext, createContext, FC, useState, useEffect } from "react";
+import { useAppContext } from "./appContext";
 
 const WishlistContext = createContext({
     items : [],
@@ -15,6 +16,7 @@ export const useWishlistContext = () => {
 export const WishlistProvider = ({ children }) => {
 
     const [items, setItems] = useState([]);   
+    const { showToast } = useAppContext();
 
     const addItem = async (item) => {
         try {
@@ -22,6 +24,7 @@ export const WishlistProvider = ({ children }) => {
                 alert('Please login to add item in wishlist');
                 return;
             }
+            showToast('Adding item to wishlist', 'Pending');
             const response = await fetch('/api/wishlist', {
                 method: 'POST',
                 headers: {
@@ -30,11 +33,15 @@ export const WishlistProvider = ({ children }) => {
                 body: JSON.stringify({productId : item}),
             });
             const data = await response.json();
-            console.log(data);
-            // setItems(data);
+            if(data.error){
+                showToast(data.error, 'Error');
+                return;
+            }
+            showToast('Item added to wishlist', 'Success');
             getWishlistItems();
         } catch (error) {
             console.error('Error:', error);
+            showToast('Error in adding item', 'Error');
         }
     };
 
@@ -57,6 +64,7 @@ export const WishlistProvider = ({ children }) => {
 
     const deletewishlist = async (item) => {
         try {
+            showToast('Removing item from wishlist', 'Pending');
             fetch('/api/wishlist/'+item.id, {
                 method: 'DELETE',
                 headers: {
@@ -65,11 +73,16 @@ export const WishlistProvider = ({ children }) => {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                if(data.error){
+                    showToast(data.error, 'Error');
+                    return;
+                }
+                showToast('Item removed from wishlist', 'Success');
                 getWishlistItems();
             })
         } catch (error) {
             console.error('Error:', error);
+            showToast('Error in adding item', 'Error');
         }
     };
 

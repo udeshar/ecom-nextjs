@@ -20,7 +20,6 @@ const ExploreCategory = ({categories} : Props) => {
           categories?.map((category, index) => {
             return <CategoryCard key={index} category={category} />
           })
-        
         }
       </div>
     </div>

@@ -72,7 +72,7 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                                 activeColor="#ffd700"
                                 edit={false}
                             /> 
-                            <p className="text-gray-500 text-sm my-3" >( 44 reviews )</p>
+                            <p className="text-gray-500 text-sm my-3" >{`(${reviews.length} reviews)`}</p>
                         </div>
                         <h3 className="font-medium text-xl mt-3" >Description</h3>
                         <p className="text-gray-500 text-sm font-light mt-4" >{product?.description}</p>
@@ -117,19 +117,25 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                                 </>
                             )
                         }
-                        <h3 className="font-medium text-xl mt-10" >All Reviews</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-8 my-5" >
-                            <div className="col-span-3 order-last md:order-first" >
-                                {
-                                    reviews && reviews.length > 0 && reviews.map((review : any, index : number) => (
-                                        <Review key={index} review={review} />
-                                    )) || <p className="text-gray-500 text-sm" >No reviews yet</p>
-                                }
-                            </div>
-                            <div className="col-span-2 mb-4 md:mb-0" >
-                                <OverallRating reviews={reviews} />
-                            </div>
-                        </div>
+                        {
+                            reviews.length > 0 &&
+                            <>
+                                <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-8 my-10 mt-10" >
+                                    <div className="col-span-3 order-last md:order-first" >
+                                        <h3 className="font-medium text-xl" >All Reviews</h3>
+                                        {
+                                            reviews && reviews.length > 0 && reviews.map((review : any, index : number) => (
+                                                <Review key={index} review={review} />
+                                            )) || <p className="text-gray-500 text-sm" >No reviews yet</p>
+                                        }
+                                    </div>
+                                    <div className="col-span-2 mb-4 md:mb-0" >
+                                        <OverallRating reviews={reviews} />
+                                    </div>
+                                </div>
+                            </>
+                        }
+                        
                     </div>
                 </div>
             </div>

@@ -9,7 +9,7 @@ const CategoryCard = ({category} : {category : category}) => {
   const router = useRouter();
 
   return (
-    <div onClick={()=>router.push(`/${category.name}`)} className='dark:bg-slate-700 bg-slate-100 p-3 py-4 sm:p-5 col-span-1 rounded-md flex justify-between items-center' >
+    <div onClick={()=>router.push(`/${category.name}`)} className='dark:bg-slate-700 bg-slate-100 p-3 py-4 sm:p-5 col-span-1 rounded-md flex justify-between items-center cursor-pointer' >
         <div className='flex-1' >
             <p className="text-xs sm:text-md text-slate-500 font-normal" >Top Deal</p>
             <p className="text-xs sm:text-md md:text-lg font-bold my-2" >{category.name}</p>

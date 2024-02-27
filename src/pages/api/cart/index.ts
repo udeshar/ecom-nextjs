@@ -27,7 +27,11 @@ export default async function handler(req : NextApiRequest, res : NextApiRespons
                     cartId : cart.id
                 },
                 include: {
-                    product: true
+                    product: {
+                        include: {
+                            category: true
+                        }
+                    }
                 }
             })
             return res.status(200).json(cartItems);

@@ -22,13 +22,13 @@ const Wishlistt = () => {
                     )) : <h1 className="text-2xl text-center">No items in wishlist</h1>
                 }
             </div>
-            {
-                items.length > 0 && (
-                    <div className="mt-8">
-                        <button className="bg-black text-white px-3 py-2 rounded-md w-full md:w-60">Checkout</button>
-                    </div>
-                )
-            }
+            {/* {
+              items.length > 0 && (
+                  <div className="mt-8">
+                      <button className="bg-black text-white px-3 py-2 rounded-md w-full md:w-60">Checkout</button>
+                  </div>
+              )
+            } */}
         </div>
     </Layout>
   )

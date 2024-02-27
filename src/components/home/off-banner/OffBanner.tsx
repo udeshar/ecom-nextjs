@@ -2,9 +2,11 @@ import React from "react";
 import Image from "next/image";
 import BtnUnderline from "@/components/common/custom-button/BtnUnderline";
 import { product } from "@prisma/client";
+import Link from "next/link";
 
-const OffBanner = ({product} : {product : product}) => {
+const OffBanner = ({product} : {product : any}) => {
   return (
+    <Link href={`/${product.category.name}/${product.name}`}>
     <div className="flex justify-between items-center h-full px-3 sm:px-6 md:px-10 py-6">
       <div className="flex-3">
         <p className="text-xs sm:text-sm md:text-lg text-slate-400 font-medium my-3 sm:my-5">
@@ -27,6 +29,7 @@ const OffBanner = ({product} : {product : product}) => {
         />
       </div>
     </div>
+    </Link>
   );
 };
 

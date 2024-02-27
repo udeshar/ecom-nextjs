@@ -56,18 +56,27 @@ export async function getStaticProps() {
   const faeturedProducts = await prisma.product.findMany({
     where: {
       featured: true
+    },
+    include: {
+      category: true
     }
   })
 
   const bestSeller = await prisma.product.findMany({
     where: {
       bestSeller: true
+    },
+    include: {
+      category: true
     }
   })
 
   const offered = await prisma.product.findMany({
     where: {
       offered: true
+    },
+    include: {
+      category: true
     }
   })
 
