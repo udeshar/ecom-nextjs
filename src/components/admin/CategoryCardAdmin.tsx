@@ -12,12 +12,12 @@ const CategoryCardAdmin = ({category} : IAdminProps) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/admin/category/${category.name.toLowerCase()}`)
+    router.push(`/admin/category/${category.name}`)
   }
 
   const handleBtnClick = (e:React.MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
     e.stopPropagation()
-    router.push(`/admin/category/${category.name.toLowerCase()}/products`)
+    router.push(`/admin/category/${category.name}/products`)
   }
 
   return (

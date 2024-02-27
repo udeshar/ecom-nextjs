@@ -1,12 +1,11 @@
 import React from 'react'
 import Layout from '@/components/layout/Layout'
-import ProductList from '@/components/home/product-list/ProductList'
 import CategoryProduct from '@/components/category/categoryProduct/CategoryProduct'
 import CustomSelect from '@/components/common/custom-input/CustomSelect'
 import CustomInput from '@/components/common/custom-input/CustomInput'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import { BiSearch } from 'react-icons/bi'
-import { PrismaClient, product } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import { useRouter } from 'next/router'
 
 const Index = ({products} : {products : any}) => {
@@ -65,6 +64,7 @@ export async function getStaticProps({params} : any) {
         }
     })
     if(!categoryData) {
+        await prisma.$disconnect()
         return {
             notFound : true
         }
@@ -77,6 +77,7 @@ export async function getStaticProps({params} : any) {
             category : true
         }
     })
+    await prisma.$disconnect()
     return {
       props: {
         products : JSON.parse(JSON.stringify(products))
@@ -90,5 +91,6 @@ export async function getStaticPaths() {
     const paths = categories.map((category) => ({
       params: { category: category.name },
     }))
-    return { paths, fallback: true }
+    await prisma.$disconnect()
+    return { paths, fallback: 'blocking' }
 }

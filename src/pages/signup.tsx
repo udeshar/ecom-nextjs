@@ -10,7 +10,6 @@ const Signup = () => {
 
     const handleSignup = (e:FormEvent) => {
         e.preventDefault()
-        console.log("Signup")
         const formData = new FormData(e.target as HTMLFormElement);
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
@@ -34,19 +33,7 @@ const Signup = () => {
                 }
                 else {
                     console.log(data)
-                    // const result = await signIn("credentials", {
-                    //     email: e.target.email.value,
-                    //     password: e.target.password.value,
-                    //     redirect: false,
-                    // })
-                    // if (!result.error) {
-                    //     console.log("Login success")
-                    //     router.push("/")
-                    // }
-                    // else {
-                    //     alert(data.message)
-                        router.push("/login")
-                    // }
+                    router.push("/login")
                 }
             })
             .catch(err => alert(err))
@@ -98,21 +85,3 @@ const Signup = () => {
 }
 
 export default Signup
-
-// export async function getServerSideProps(context) {
-//     console.log('context', context);
-//     const session = await getSession(context);
-//     if(session) {
-//         return {
-//             redirect: {
-//                 destination: '/',
-//                 permanent: false
-//             }
-//         }
-//     }
-//     return {
-//         props: {
-            
-//         }
-//     }
-// }

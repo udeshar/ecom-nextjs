@@ -33,7 +33,6 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
         })
         .then(res => res.json())
         .then(data => {
-            console.log(data);
             setReviews(data);
         })
         .catch(err => console.log(err))
@@ -43,13 +42,10 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
         if(user){
             const alredyReviewed = reviews.some((review : any) => {
                 if(review.userId == (user as any).id){
-                    console.log(review.userId, (user as any).id);
                     return true;
                 }
-                console.log(review.userId, (user as any).id);
                 return false;
             })
-            console.log(alredyReviewed);
             setAlredyReviewed(alredyReviewed);
         }
     }, [user, reviews])
@@ -164,6 +160,8 @@ export async function getStaticProps({params} : any) {
         }
     });
 
+    await prisma.$disconnect();
+
     return {
         props: {
             product : JSON.parse(JSON.stringify(productData)),
@@ -172,7 +170,7 @@ export async function getStaticProps({params} : any) {
     }
 }
 
-export async function getStaticPaths(context : any) {
+export async function getStaticPaths() {
     const prisma = new PrismaClient();
     const products = await prisma.product.findMany();
     const categories = await prisma.category.findMany();
@@ -186,10 +184,10 @@ export async function getStaticPaths(context : any) {
         }
     });
 
-    console.log(paths);
+    await prisma.$disconnect();
 
     return {
         paths,
-        fallback: true
+        fallback: 'blocking'
     }
 }

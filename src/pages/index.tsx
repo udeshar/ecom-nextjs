@@ -1,11 +1,5 @@
-import { Inter } from "next/font/google";
-import Navbar from "@/components/common/navbar/Navbar";
-import ToggleTheme from "@/components/common/theme/ToggleTheme";
 import Layout from "@/components/layout/Layout";
-import CustomInput from "@/components/common/custom-input/CustomInput";
 import Container from "@/components/common/container/Container";
-import img from "@/assets/images/headphone.png";
-import Image from "next/image";
 import Slider from "@/components/home/slider/Slider";
 import OfferCard from "@/components/home/card/OfferCard";
 import ProductList from "@/components/home/product-list/ProductList";
@@ -51,9 +45,8 @@ export default function Home({categories, products, bestSeller, faeturedProducts
 
 export async function getStaticProps() {
   const prisma = new PrismaClient()
-  const categories = await prisma.category.findMany()
 
-  // get products with their categories
+  const categories = await prisma.category.findMany()
   const products = await prisma.product.findMany({
     include: {
       category: true
@@ -86,5 +79,6 @@ export async function getStaticProps() {
       bestSeller : JSON.parse(JSON.stringify(bestSeller)),
       offered : JSON.parse(JSON.stringify(offered))
     },
+    revalidate: 30
   };
 }

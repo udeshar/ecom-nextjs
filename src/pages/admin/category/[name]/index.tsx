@@ -10,7 +10,6 @@ import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useRouter } from 'next/router'
 import { PrismaClient, category } from '@prisma/client'
-import { redirect } from 'next/navigation'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
 import cookie from 'cookie';
 
@@ -216,19 +215,18 @@ export async function getServerSideProps(context:any) {
         return redr
     }
 
-    const {params} = context;
+    const {name} = context.params;
     
-    const {name} = params;
     const prisma = new PrismaClient();
     const category = await prisma.category.findUnique({
         where: {
             name
         }
     });
-    console.log(category + " category*****************************************");
+    await prisma.$disconnect();
     if (!category) {
         return {
-            notFound: true // Indicate that the page should return a 404 Not Found
+            notFound: true
         };
     }
     return {
@@ -237,12 +235,3 @@ export async function getServerSideProps(context:any) {
         }
     }
 }
-
-// export async function getStaticPaths() {
-//     const prisma = new PrismaClient();
-//     const categories = await prisma.category.findMany();
-//     const paths = categories.map((category) => ({
-//         params: { name: category.name.toLowerCase() },
-//     }));
-//     return { paths, fallback: true  };
-// }

@@ -1,7 +1,6 @@
 import React from 'react'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
 import Container from '@/components/common/container/Container'
-// import ExploreCategory from '@/components/home/explore-category/ExploreCategory'
 import CategoriesAdmin from '@/components/admin/CategoriesAdmin'
 import { Button } from 'flowbite-react'
 import Link from 'next/link'
@@ -15,7 +14,6 @@ interface IAdminProps {
 }
 
 const admin = ({categories} : IAdminProps  ) => {
-  console.log(categories)
   return (
     <LayoutAdmin>
       <Container className='py-5' >
@@ -36,7 +34,8 @@ const admin = ({categories} : IAdminProps  ) => {
 export default admin
 
 export async function getServerSideProps(context:any) {
-
+  
+  const prisma = new PrismaClient()
   try {
     const redr = {
       redirect: {
@@ -54,7 +53,6 @@ export async function getServerSideProps(context:any) {
       return redr
     }
   
-    const prisma = new PrismaClient()
     const categories = await prisma.category.findMany()
     const eachProductCountInCategory = await Promise.all(categories.map(async (category) => {
       const count = await prisma.product.count({
@@ -76,6 +74,7 @@ export async function getServerSideProps(context:any) {
       },
     }
   } catch (error: CustomError | any) {
+      prisma.$disconnect()
       console.log(error)
       return {
         redirect: {

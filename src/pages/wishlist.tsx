@@ -1,20 +1,14 @@
 import React from 'react'
 import Layout from '@/components/layout/Layout'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
-// import CartItem from '@/components/cart/CartItem'
 import WishlistItem from '@/components/cart/WishlistItem'
 import { PrismaClient, wishlistItems } from '@prisma/client'
 import cookie from 'cookie';
-import { checkIfUserExist, checkIfUserExist2 } from '@/helpers/dbUtils'
+import { checkIfUserExist2 } from '@/helpers/dbUtils'
 import { v4 as uuidv4 } from 'uuid';
 import { useWishlistContext } from '@/context/wishlistContext'
 
-interface IWishlistProps {
-  wishlistItem: wishlistItems[]
-}
-
-const Wishlistt = ({wishlistItem} : IWishlistProps) => {
-  console.log(wishlistItem)
+const Wishlistt = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {items} = useWishlistContext();
   return (
@@ -43,7 +37,6 @@ const Wishlistt = ({wishlistItem} : IWishlistProps) => {
 export default Wishlistt
 
 export const getServerSideProps = async (context : any) => {
-
   const redr = {
     redirect: {
       destination: '/login',
@@ -66,6 +59,7 @@ export const getServerSideProps = async (context : any) => {
           userId: user.id,
       }
   });
+
   if(!wishlist){
     await prisma.wishlist.create({
       data: {
@@ -73,23 +67,11 @@ export const getServerSideProps = async (context : any) => {
         userId: user.id
       }
     })
-    return{
-      props: {
-        wishlistItem: []
-      }
-    }
   }
-  const wishlistItem = await prisma.wishlistItems.findMany({
-    where:{
-        wishlistId : wishlist.id
-    },
-    include: {
-        product: true
-    }
-  })
+  await prisma.$disconnect()
   return {
       props: {
-          wishlistItem : JSON.parse(JSON.stringify(wishlistItem))
+          
       },
   }
 }

@@ -1,6 +1,5 @@
 import React from 'react'
 import Layout from '@/components/layout/Layout'
-import ProductList from '@/components/home/product-list/ProductList'
 import CategoryProduct from '@/components/category/categoryProduct/CategoryProduct'
 import CustomSelect from '@/components/common/custom-input/CustomSelect'
 import CustomInput from '@/components/common/custom-input/CustomInput'
@@ -11,7 +10,8 @@ import { PrismaClient, product } from '@prisma/client'
 import { Button } from 'flowbite-react'
 import Link from 'next/link'
 import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie';
+import cookie from 'cookie'
+import LayoutAdmin from '@/components/layout/LayoutAdmin'
 
 interface IAdminProps {
     products: product[]
@@ -21,11 +21,9 @@ const AdminProducts = ({products} : IAdminProps) => {
 
     const router = useRouter();
     const { name } = router.query;
-    console.log(name);
-    console.log(products);
 
   return (
-    <Layout>
+    <LayoutAdmin>
         <>
         <BreadCrumd firstTitle={name as string} secondTitle='products' />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,7 +63,7 @@ const AdminProducts = ({products} : IAdminProps) => {
             </div>
         </div>
         </>
-    </Layout>
+    </LayoutAdmin>
   )
 }
 
@@ -89,32 +87,34 @@ export async function getServerSideProps(context:any){
         return redr
     }
 
-    const {params} = context;
+    const {name} = context.params;
 
-    const {name} = params;
     const prisma = new PrismaClient();
+
+    console.log(name);
+
+    const category = await prisma.category.findUnique({
+        where: {
+            name: name
+        }
+    });
+
+    if (!category) {
+        console.log(category, "*****************")
+        return {
+            notFound: true
+        }
+    }
+
     const products = await prisma.product.findMany({
         where: {
-            category: {
-                name
-            }
+            categoryId: category.id
         }
     })
+    await prisma.$disconnect();
     return {
         props: {
             products : JSON.parse(JSON.stringify(products)),
         }
     }
 }
-
-// export async function getStaticPaths() {
-//     const prisma = new PrismaClient();
-//     const categories = await prisma.category.findMany();
-//     const paths = categories.map((category) => ({
-//         params: { name: category.name },
-//     }))
-//     return {
-//         paths,
-//         fallback: true
-//     }
-// }

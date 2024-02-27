@@ -62,14 +62,16 @@ const AddCategory = () => {
             fetch('/api/category', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({name, description, image: previewImage}),
             })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data);
+                if(data.error){
+                    setError(data.error);
+                    return;
+                }
                 router.push('/admin');
             })
             .catch((error) => {

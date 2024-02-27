@@ -17,7 +17,6 @@ const Login = () => {
 
     const loginHandler = async (e: FormEvent) => {
         e.preventDefault()
-        console.log("Login")
         const formData = new FormData(e.target as HTMLFormElement);
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
@@ -81,21 +80,3 @@ const Login = () => {
 }
 
 export default Login
-
-// export async function getServerSideProps(context) {
-//     console.log('context', context);
-//     const session = await getSession(context);
-//     if(session) {
-//         return {
-//             redirect: {
-//                 destination: '/',
-//                 permanent: false
-//             }
-//         }
-//     }
-//     return {
-//         props: {
-            
-//         }
-//     }
-// }

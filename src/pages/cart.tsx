@@ -4,16 +4,11 @@ import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import CartItem from '@/components/cart/CartItem'
 import { PrismaClient, cartItems } from '@prisma/client'
 import cookie from 'cookie';
-import { checkIfUserExist, checkIfUserExist2 } from '@/helpers/dbUtils'
+import { checkIfUserExist2 } from '@/helpers/dbUtils'
 import { v4 as uuidv4 } from 'uuid';
 import { useCartContext } from '@/context/cartContext'
 
-interface ICartProps {
-  cartItems: cartItems[]
-}
-
-const cart = ({cartItems} : ICartProps) => {
-  console.log(cartItems)
+const cart = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {items} = useCartContext();
   return (
@@ -42,18 +37,19 @@ const cart = ({cartItems} : ICartProps) => {
 export default cart
 
 export const getServerSideProps = async (context : any) => {
-
   const redr = {
     redirect: {
       destination: '/login',
       permanent: false,
     },
   }
+
   const cookies = cookie.parse(context.req.headers.cookie || '');
   const token = cookies.token;
   if(!token){
     return redr
   }
+
   const user = await checkIfUserExist2(token);
   if (!user) {
     return redr
@@ -65,6 +61,7 @@ export const getServerSideProps = async (context : any) => {
           userId: user.id,
       }
   });
+
   if(!cart){
     await prisma.cart.create({
       data: {
@@ -72,23 +69,11 @@ export const getServerSideProps = async (context : any) => {
         userId: user.id
       }
     })
-    return{
-      props: {
-        cartItems: []
-      }
-    }
   }
-  const cartItems = await prisma.cartItems.findMany({
-    where:{
-        cartId : cart.id
-    },
-    include: {
-        product: true
-    }
-  })
+  await prisma.$disconnect();
   return {
       props: {
-          cartItems : JSON.parse(JSON.stringify(cartItems))
+          
       },
   }
 }

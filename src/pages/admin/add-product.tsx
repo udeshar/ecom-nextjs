@@ -68,13 +68,10 @@ const AddProduct = ({categories} : AddProductProps) => {
             return;
         }
         else{
-            console.log('Form Data : ', formData)
-            console.log(featuredProduct, bestSeller, offered)
             fetch('/api/product', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
                 },
                 body: JSON.stringify({
                     productName,
@@ -91,7 +88,6 @@ const AddProduct = ({categories} : AddProductProps) => {
             })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
                 if(data.error){
                     setError(data.message);
                 }
@@ -293,6 +289,7 @@ export async function getServerSideProps(context:any) {
 
     const prisma = new PrismaClient()
     const categories = await prisma.category.findMany()
+    await prisma.$disconnect()
     return {
         props: {
             categories : JSON.parse(JSON.stringify(categories))
