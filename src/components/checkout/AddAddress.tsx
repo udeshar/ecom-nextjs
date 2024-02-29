@@ -3,7 +3,7 @@ import CustomInput from '@/components/common/custom-input/CustomInput'
 import { useAppContext } from '@/context/appContext';
 import { useUserContext } from '@/context/userContext';
 
-const AddAddress = ({setAllAddresses} : any) => {
+const AddAddress = ({setAllAddresses, setSelectedAddress} : any) => {
     const [showAddress, setShowAddress] = useState(false);
     const {showToast} = useAppContext();
     const {addAddress} = useUserContext();
@@ -25,6 +25,7 @@ const AddAddress = ({setAllAddresses} : any) => {
                 data, 
                 (dataa:any)=>{
                     setAllAddresses(dataa);
+                    setSelectedAddress(dataa[dataa.length - 1]);
                     showToast('Address added successfully', 'Success');
                     setShowAddress(false);
                 }, 

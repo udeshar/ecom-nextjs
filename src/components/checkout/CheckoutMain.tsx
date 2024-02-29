@@ -102,7 +102,7 @@ const CheckoutMain = ({addresses, items} : any) => {
                                 />
                             ))
                         }
-                        <AddAddress setAllAddresses={setAllAddresses} />
+                        <AddAddress setAllAddresses={setAllAddresses} setSelectedAddress={setSelectedAddress} />
 
                         <div className="mt-8" >
                             <h1 className="text-xl font-medium mb-4" >Payment method</h1>

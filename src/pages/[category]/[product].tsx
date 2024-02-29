@@ -184,6 +184,7 @@ export async function getStaticProps({params} : any) {
             product : JSON.parse(JSON.stringify(productData)),
             reviewsData : JSON.parse(JSON.stringify(reviews))
         },
+        revalidate: 30
     }
 }
 
