@@ -6,6 +6,10 @@ const UserContext = createContext({
     login: (email, password, callback, onError) => {},
     logout: (callback) => {},
     getUser: () => {},
+    getAllAddresses: (callback, onError) => {},
+    addAddress: (address, callback, onError) => {},
+    updateAddress: (address, callback, onError) => {},
+    deleteAddress: (addressId, callback, onError) => {},
 });
 
 export const useUserContext = () => {
@@ -83,6 +87,94 @@ export const UserProvider = ({ children }) => {
         }
     }
 
+    async function getAllAddresses(callback, onError){
+        try {
+            fetch('/api/user/address', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    callback(data);
+                }
+            })
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function addAddress(address, callback, onError){
+        try {
+            fetch('/api/user/address', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(address),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    getAllAddresses((data)=> callback(data), (err)=> onError(err));
+                }
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function deleteAddress(addressId, callback, onError){
+        try {
+            fetch('/api/user/address', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({id : addressId}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    getAllAddresses((data)=> callback(data), (err)=> onError(err));
+                }
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function updateAddress(address, callback, onError){
+        try {
+            fetch('/api/user/address', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(address),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    getAllAddresses((data)=> callback(data), (err)=> onError(err));
+                }
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token){
@@ -95,7 +187,11 @@ export const UserProvider = ({ children }) => {
         setUser : getUser,
         login,
         logout,
-        getUser
+        getUser,
+        getAllAddresses,
+        addAddress,
+        updateAddress,
+        deleteAddress,
     };
 
     return (

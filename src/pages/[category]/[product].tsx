@@ -11,6 +11,8 @@ import { useCartContext } from '@/context/cartContext';
 import { useWishlistContext } from '@/context/wishlistContext';
 import { useUserContext } from '@/context/userContext';
 import AddReview from '@/components/product/AddReview';
+import BtnUnderline from '@/components/common/custom-button/BtnUnderline';
+import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
 
 const ProductCard = ({product, reviewsData} : {product : product, reviewsData : any}) => {
     const router = useRouter();
@@ -87,21 +89,30 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                         </div>
                         {/* Add to cart */}
                         <div className="flex gap-5 items-center" >
-                        {
-                            isItemExist && <div className="mt-5" >
-                                <button onClick={()=> router.push('/cart')} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Go to cart</button>
-                            </div> || <div className="mt-5" >
-                                <button onClick={()=> addItem(product?.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Add to Cart</button>
+                            <div>
+                                <div className="mt-5" >
+                                    <button onClick={()=> addItem(product?.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Buy Now</button>
+                                </div>
                             </div>
-                        }
-                        {
-                            data && data.length > 0 && data[0].product.id === product?.id &&
-                            <div className="mt-5" >
-                                <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button>
-                            </div> || <div className="mt-5" >
-                                <button onClick={()=> addIteminwish(product?.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button>
+                            <div className="flex gap-5 items-center" >
+                                {
+                                    isItemExist && <div className="mt-5" >
+                                        <BtnUnderline onClick={()=> router.push('/cart')} >Go to cart <IoCartOutline size={20} className='inline ml-1' /></BtnUnderline>
+                                    </div> || <div className="mt-5" >
+                                        <BtnUnderline onClick={()=> addItem(product?.id)} >Add to Cart <IoCartOutline size={20} className='inline ml-1' /></BtnUnderline>
+                                    </div>
+                                }
+                                {
+                                    data && data.length > 0 && data[0].product.id === product?.id &&
+                                    <div className="mt-5" >
+                                        <IoHeartSharp onClick={()=> deletewishlist(data[0])} size={23} className="cursor-pointer text-red-400" />
+                                        {/* <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button> */}
+                                    </div> || <div className="mt-5" >
+                                        <IoHeartOutline onClick={()=> addIteminwish(product?.id)} size={23} className="cursor-pointer text-red-400" />
+                                        {/* <button onClick={()=> addIteminwish(product?.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button> */}
+                                    </div>
+                                }
                             </div>
-                        }
                         </div>
                     </div>
                 </div>

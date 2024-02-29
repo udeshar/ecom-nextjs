@@ -19,6 +19,23 @@ model User {
   cart    cart?
   wishlist wishlist?
   reviews review[]
+  addresses address[]
+  orders order[]
+}
+
+model address {
+  id        String @id
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  firstName String
+  lastName  String
+  address   String
+  city      String
+  state     String
+  zip       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    order[]
 }
 
 model category {
@@ -50,6 +67,7 @@ model product {
   cartItems   cartItems[]
   wishlistItems wishlistItems[]
   reviews     review[]
+  orderItems  orderItems[]
 }
 
 model cart {
@@ -89,6 +107,29 @@ model wishlistItems {
   product     product @relation(fields: [productId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model order {
+  id        String @id
+  userId    String
+  user      User   @relation(fields: [userId], references: [id])
+  addressId String
+  address   address @relation(fields: [addressId], references: [id])
+  total     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orderItems orderItems[]
+}
+
+model orderItems {
+  id        String @id
+  orderId   String
+  order     order  @relation(fields: [orderId], references: [id])
+  productId String
+  product   product @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model review {
