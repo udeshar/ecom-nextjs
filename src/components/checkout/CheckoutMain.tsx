@@ -50,6 +50,14 @@ const CheckoutMain = ({addresses, items} : any) => {
     const totalPrice = items.reduce((acc : any, item : any) => acc + (item.product.price * item.quantity), 0);
 
     const handleSubmit = async () => {
+        if(!selectedAddress){
+            showToast('Please select an address', 'Error')
+            return
+        }
+        if(!selectedPaymentMethod){
+            showToast('Please select a payment method', 'Error')
+            return
+        }
         const orderItems = items.map((item : any) => {
             return {
                 id : uuidv4(),
