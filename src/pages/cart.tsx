@@ -7,10 +7,13 @@ import cookie from 'cookie';
 import { checkIfUserExist2 } from '@/helpers/dbUtils'
 import { v4 as uuidv4 } from 'uuid';
 import { useCartContext } from '@/context/cartContext'
+import { useRouter } from 'next/router';
 
-const cart = () => {
+const Cart = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {items} = useCartContext();
+  const router = useRouter();
+
   return (
     <Layout>
         <BreadCrumd firstTitle='Cart' secondTitle='' />
@@ -25,7 +28,7 @@ const cart = () => {
             {
                 items.length > 0 && (
                     <div className="mt-8">
-                        <button className="bg-black text-white px-3 py-2 rounded-md w-full md:w-60">Checkout</button>
+                        <button onClick={()=> router.push('/checkout') } className="bg-black text-white px-3 py-2 rounded-md w-full md:w-60">Checkout</button>
                     </div>
                 )
             }
@@ -34,7 +37,7 @@ const cart = () => {
   )
 }
 
-export default cart
+export default Cart
 
 export const getServerSideProps = async (context : any) => {
   const redr = {

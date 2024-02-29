@@ -1,13 +1,17 @@
 import { address } from '@prisma/client'
 import React from 'react'
 
-const AddressCard = ({address, setEditableAddress, setOpenModal} : {address : address, setEditableAddress : any, setOpenModal : any}) => {
+const AddressCard = ({address, setEditableAddress, setOpenModal, setSelectedAddress , selectedAddress} : {address : address, setEditableAddress : any, setOpenModal : any, setSelectedAddress : any, selectedAddress : address}) => {
     return (
         <div className="bg-slate-50 dark:bg-slate-700 rounded-sm py-4 px-8 mb-3 flex justify-between" >
             <div className="flex items-center gap-3" >
                 {/* checkbox */}
                 <div className="mr-3" >
-                    <input type="checkbox" name="address" id="address" />
+                    <input checked={selectedAddress.id == address.id} type="checkbox" name="address" id="address" onChange={(e)=> {
+                        if(e.target.checked) {
+                            setSelectedAddress(address)
+                        }
+                    }} />
                 </div>
                 <p>
                     {address.firstName} {address.lastName}

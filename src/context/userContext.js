@@ -10,6 +10,7 @@ const UserContext = createContext({
     addAddress: (address, callback, onError) => {},
     updateAddress: (address, callback, onError) => {},
     deleteAddress: (addressId, callback, onError) => {},
+    placeOrder: (order, callback, onError) => {},
 });
 
 export const useUserContext = () => {
@@ -175,6 +176,28 @@ export const UserProvider = ({ children }) => {
         }
     }
 
+    async function placeOrder(order, callback, onError){
+        try {
+            fetch('/api/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(order),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    callback(data);
+                }
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         const token = localStorage.getItem('token');
         if(token){
@@ -192,6 +215,7 @@ export const UserProvider = ({ children }) => {
         addAddress,
         updateAddress,
         deleteAddress,
+        placeOrder
     };
 
     return (

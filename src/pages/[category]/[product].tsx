@@ -91,7 +91,7 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                         <div className="flex gap-5 items-center" >
                             <div>
                                 <div className="mt-5" >
-                                    <button onClick={()=> addItem(product?.id)} className="bg-blue-600 text-white px-5 py-2 rounded-md" >Buy Now</button>
+                                    <button onClick={()=> router.push('/checkout/'+ product?.id) } className="bg-blue-600 text-white px-5 py-2 rounded-md" >Buy Now</button>
                                 </div>
                             </div>
                             <div className="flex gap-5 items-center" >

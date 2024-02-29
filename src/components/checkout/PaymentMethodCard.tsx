@@ -6,13 +6,14 @@ interface PaymentMethodCardProps {
         icon: string,
         title: string,
         description: string
-    }
+    },
+    selected: boolean
 
 }
 
-const PaymentMethodCard = ({item} : PaymentMethodCardProps) => {
+const PaymentMethodCard = ({item, selected} : PaymentMethodCardProps) => {
     return (
-        <div className="bg-slate-50 dark:bg-slate-700 rounded-sm py-4 px-8 mb-3 flex items-center gap-6" >
+        <div className={`${selected && " border border-green-500 "} bg-slate-50 dark:bg-slate-700 rounded-sm py-4 px-8 mb-3 flex items-center gap-6`} >
             <div className='rounded-sm bg-white w-16 h-16 flex items-center justify-center' >
                 {/* <TbCoinRupeeFilled size={40} /> */}
                 <Image src={item.icon} width={40} height={40} alt="rupee" />
