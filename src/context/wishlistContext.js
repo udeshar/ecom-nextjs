@@ -86,13 +86,13 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if(token){
-            console.log('token', token);
-            getWishlistItems();
-        }
-    }, []);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     if(token){
+    //         console.log('token', token);
+    //         getWishlistItems();
+    //     }
+    // }, []);
 
     const values = {
         items : items,

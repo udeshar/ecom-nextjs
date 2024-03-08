@@ -112,12 +112,12 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if(token){
-            getCartItems();
-        }
-    }, []);
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     if(token){
+    //         getCartItems();
+    //     }
+    // }, []);
 
     const values = {
         items : items,

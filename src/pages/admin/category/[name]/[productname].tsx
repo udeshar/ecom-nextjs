@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
 import Container from '@/components/common/container/Container'
 import CustomInput from '@/components/common/custom-input/CustomInput'
@@ -9,31 +9,55 @@ import Image from 'next/image'
 import { AiOutlineDelete } from "react-icons/ai";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
-import { PrismaClient, category, product } from '@prisma/client'
 import { useRouter } from 'next/router'
-import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie';
+import { useProductsContext } from '@/context/productContext'
+import { useUserContext } from '@/context/userContext'
+import { API_URL } from '@/helpers/constants'
 
-interface UpdateProductProps {
-    categories: category[]
-}
+const UpdateProduct = () => {
 
-const UpdateProduct = ({product} : {product : product}) => {
-
+    const { isAdminLoggedIn } = useUserContext()
     const router = useRouter();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const { singleProduct, getProductByName } : any = useProductsContext();
+
+    useEffect(() => {
+        isAdminLoggedIn(()=>{ setIsAdmin(true)}, () => {router.push('/login')})
+    }, [])
+
+    useEffect(() => {
+        if(router.query.productname){
+            getProductByName(`name=${router.query.productname}`)
+        }
+    }, [router.query.productname])
+
+    useEffect(() => {
+        setProductData({
+            name: singleProduct?.name,
+            price: singleProduct?.price?.toString(),
+            offer: singleProduct?.offer?.toString() || undefined,
+            availability: singleProduct?.availability,
+            description: singleProduct?.description || undefined,
+            imagePath : singleProduct?.imagePath,
+            featured: singleProduct?.featured,
+            bestSeller: singleProduct?.bestSeller,
+            offered: singleProduct?.offered
+        })
+    }, [singleProduct])
+
     const [previewImage, setPreviewImage] = useState<string| ArrayBuffer | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | null>(null);
     const [productData, setProductData] = useState({
-        name: product.name,
-        price: product.price.toString(),
-        offer: product.offer?.toString() || undefined,
-        availability: product.availability,
-        description: product.description || undefined,
-        imagePath : product.imagePath,
-        featured: product.featured,
-        bestSeller: product.bestSeller,
-        offered: product.offered
+        name: singleProduct?.name,
+        price: singleProduct?.price?.toString(),
+        offer: singleProduct?.offer?.toString() || undefined,
+        availability: singleProduct?.availability,
+        description: singleProduct?.description || undefined,
+        imagePath : singleProduct?.imagePath,
+        featured: singleProduct?.featured,
+        bestSeller: singleProduct?.bestSeller,
+        offered: singleProduct?.offered
     })
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,39 +88,34 @@ const UpdateProduct = ({product} : {product : product}) => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const productName = formData.get('productName');
-        const productPrice = formData.get('productPrice');
-        const offProduct = formData.get('offProduct');
+        const productName = formData.get('name');
+        const productPrice = formData.get('price');
+        const offProduct = formData.get('offer');
         const availability = formData.get('availability');
-        const productDescription = formData.get('productDescription');
+        const productDescription = formData.get('description');
+        const featured = formData.get('featured');
+        const bestSeller = formData.get('bestSeller');
+        const offered = formData.get('offered');
+
+        console.log(featured, bestSeller, offered, 'Featured, Best Seller, Offered')
+
+        formData.append('image', productData.imagePath);
 
         if (!productName || !productPrice || !offProduct || !availability || !productDescription) {
             setError('All fields are required');
             return;
-        } else if(!previewImage && !productData.imagePath){
+        } else if(!previewImage && !productData?.imagePath){
             setError('Please select an image');
             return;
         }
         else{
             console.log('Form Data : ', productData)
-            fetch('/api/product/'+ product.id, {
-                method: 'PATCH',
+            fetch(API_URL + '/api/product/'+ singleProduct?._id, {
+                method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || '')
                 },
-                body: JSON.stringify({
-                    productName,
-                    productPrice,
-                    offProduct,
-                    availability,
-                    productDescription,
-                    image : previewImage,
-                    imagePath : productData.imagePath,
-                    featuredProduct : productData.featured,
-                    bestSeller : productData.bestSeller,
-                    offered : productData.offered
-                })
+                body: formData
             })
             .then(res => res.json())
             .then(data => {
@@ -121,11 +140,11 @@ const UpdateProduct = ({product} : {product : product}) => {
     };
 
     const deleteHandler = () => {
-        fetch('/api/product/'+ product.id, {
+        fetch(API_URL + '/api/product/'+ singleProduct._id, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || '')
             }
         })
         .then(res => res.json())
@@ -141,6 +160,8 @@ const UpdateProduct = ({product} : {product : product}) => {
         })
     }
 
+    if(!isAdmin) return null
+
     return (
         <LayoutAdmin>
             <Container className="my-8 relative" >
@@ -152,7 +173,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Product Name"
                                 placeholder="Product Name"
                                 id='productName'
-                                name='productName'
+                                name='name'
                                 type='text'
                                 value={productData.name}
                                 onChange={(e) => setProductData({...productData, name : e.target.value})}
@@ -165,7 +186,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Product Price"
                                 placeholder="Product Price"
                                 id='productPrice'
-                                name='productPrice'
+                                name='price'
                                 type='number'
                                 value={productData.price}
                                 onChange={(e) => setProductData({...productData, price : e.target.value})}
@@ -180,7 +201,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Off on product (%)"
                                 placeholder="0 to 100"
                                 id='offProduct'
-                                name='offProduct'
+                                name='offer'
                                 type='number'
                                 required
                                 value={productData.offer}
@@ -210,7 +231,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Product Description"
                                 placeholder="Product Description"
                                 id='productDescription'
-                                name='productDescription'
+                                name='description'
                                 value={productData.description}
                                 onChange={(e) => setProductData({...productData, description : e.target.value})}
                                 required
@@ -226,7 +247,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Product Image"
                                 placeholder="Product Image"
                                 id='productImage'
-                                name='productImage'
+                                name='imagePath'
                                 type='file'
                                 required={false}
                                 className='w-full'
@@ -242,7 +263,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Is Product Featured?"
                                 placeholder="Is Product Featured?"
                                 id='featuredProduct'
-                                name='featuredProduct'
+                                name='featured'
                                 type='checkbox'
                                 className=''
                                 isChecked={productData.featured}
@@ -271,7 +292,7 @@ const UpdateProduct = ({product} : {product : product}) => {
                                 label="Does product have discount?"
                                 placeholder="Does product have discount?"
                                 id='offers'
-                                name='offers'
+                                name='offered'
                                 type='checkbox'
                                 className=''
                                 isChecked={productData.offered}
@@ -319,37 +340,3 @@ const UpdateProduct = ({product} : {product : product}) => {
 }
 
 export default UpdateProduct
-
-export async function getServerSideProps(context:any) {
-
-    const redr = {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-    }
-    const cookies = cookie.parse(context.req.headers.cookie || '');
-    const token = cookies.token;
-    if(!token){
-        return redr
-    }
-    const admin = await checkIfAdminExist2(token);
-    if (!admin) {
-        return redr
-    }
-
-    const {params} = context;
-
-    const {productname} = params;
-    const prisma = new PrismaClient()
-    const product = await prisma.product.findUnique({
-        where: {
-            name: productname // Update the property to 'id' instead of 'name'
-        }
-    })
-    return {
-        props: {
-            product : JSON.parse(JSON.stringify(product))
-        }
-    }
-}

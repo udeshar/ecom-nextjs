@@ -6,6 +6,7 @@ import ProductList from "@/components/home/product-list/ProductList";
 import styles from './styles.module.css'
 import ExploreCategory from "@/components/home/explore-category/ExploreCategory";
 import { PrismaClient, category, product } from "@prisma/client";
+import { getAllCategories, getAllProducts } from "@/services/api";
 
 interface Props {
   categories: category[];
@@ -44,41 +45,12 @@ export default function Home({categories, products, bestSeller, faeturedProducts
 }
 
 export async function getStaticProps() {
-  const prisma = new PrismaClient()
 
-  const categories = await prisma.category.findMany()
-  const products = await prisma.product.findMany({
-    include: {
-      category: true
-    }
-  })
-
-  const faeturedProducts = await prisma.product.findMany({
-    where: {
-      featured: true
-    },
-    include: {
-      category: true
-    }
-  })
-
-  const bestSeller = await prisma.product.findMany({
-    where: {
-      bestSeller: true
-    },
-    include: {
-      category: true
-    }
-  })
-
-  const offered = await prisma.product.findMany({
-    where: {
-      offered: true
-    },
-    include: {
-      category: true
-    }
-  })
+  const categories = await getAllCategories();
+  const products = await getAllProducts();
+  const faeturedProducts = await getAllProducts('featured=true');
+  const bestSeller = await getAllProducts('bestSeller=true');
+  const offered = await getAllProducts('offered=true');
 
   return {
     props: {

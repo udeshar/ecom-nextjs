@@ -3,6 +3,7 @@ import CustomInput from '@/components/common/custom-input/CustomInput';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Layoutv2 from '@/components/layout/Layoutv2';
+import { API_URL } from '@/helpers/constants';
 
 const Signup = () => {
 
@@ -14,13 +15,16 @@ const Signup = () => {
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
         const confirmPassword = formData.get("confirmPassword") as string;
+        const firstName = formData.get("firstName") as string;
+        const lastName = formData.get("lastName") as string;
 
-        fetch("/api/auth/signup", {
+        fetch(API_URL + "/api/auth/signup", {
             method: "POST",
             body: JSON.stringify({
                 email,
                 password,
-                confirmPassword
+                firstName,
+                lastName,
             }),
             headers: {
                 "Content-Type": "application/json"
@@ -45,6 +49,26 @@ const Signup = () => {
             <div className="w-80" >
                 <form onSubmit={handleSignup} >
                     <h1 className="text-3xl font-bold mb-6" >Signup</h1>
+                    <CustomInput
+                        id='firstName'
+                        label="First Name"
+                        type="text"
+                        placeholder="Enter your first name"
+                        name={"firstName"}
+                        required={true}
+                        className={"w-full"}
+                        wrapperClass='mb-3'
+                    />
+                    <CustomInput
+                        id='lastName'
+                        label="Last Name"
+                        type="text"
+                        placeholder="Enter your last name"
+                        name={"lastName"}
+                        required={true}
+                        className={"w-full"}
+                        wrapperClass='mb-3'
+                    />
                     <CustomInput
                         id='email'
                         label="Email"

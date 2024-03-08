@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
 import Container from '@/components/common/container/Container'
 import CustomInput from '@/components/common/custom-input/CustomInput'
@@ -9,23 +9,28 @@ import Image from 'next/image'
 import { AiOutlineDelete } from "react-icons/ai";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
-import { PrismaClient, category } from '@prisma/client'
 import { useRouter } from 'next/router'
-import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie';
+import { useCategoriesContext } from '@/context/categoryContext'
+import { useUserContext } from '@/context/userContext'
+import { API_URL } from '@/helpers/constants'
 
-interface AddProductProps {
-    categories: category[]
-}
-
-const AddProduct = ({categories} : AddProductProps) => {
+const AddProduct = () => {
 
     const router = useRouter();
-    const [previewImage, setPreviewImage] = useState<string| ArrayBuffer | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [error, setError] = useState<string | null>(null);
+  const [ isAdmin, setIsAdmin ] = React.useState(false)
+  const { categories } : any = useCategoriesContext()
+  const { isAdminLoggedIn } = useUserContext()
+  const [previewImage, setPreviewImage] = useState<string| ArrayBuffer | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    isAdminLoggedIn(()=>{ setIsAdmin(true) }, () => {router.push('/login')})
+  }, [])
+
+  
+  
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files && e.target.files[0];
     
         if (file) {
@@ -37,81 +42,74 @@ const AddProduct = ({categories} : AddProductProps) => {
               }
             };
             reader.readAsDataURL(file);
-          } else {
+        } else {
             // alert('Please select a PNG image.');
             setError('Please select a PNG image.');
             setPreviewImage(null);
             if (fileInputRef.current) {
-              fileInputRef.current.value = ''; // Reset file input value
+                fileInputRef.current.value = ''; // Reset file input value
             }
-          }
-        } else {
-          setPreviewImage(null);
         }
-    };
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const productName = formData.get('productName');
-        const productPrice = formData.get('productPrice');
-        const offProduct = formData.get('offProduct');
-        const availability = formData.get('availability');
-        const productDescription = formData.get('productDescription');
-        const category = formData.get('category');
-        const featuredProduct = formData.get('featuredProduct');
-        const bestSeller = formData.get('bestSeller');
-        const offered = formData.get('offers');
-
-        if (!productName || !productPrice || !offProduct || !availability || !productDescription || !category || !previewImage) {
-            setError('All fields are required');
-            return;
-        }
-        else{
-            fetch('/api/product', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productName,
-                    productPrice,
-                    offProduct,
-                    availability,
-                    productDescription,
-                    category,
-                    image : previewImage,
-                    featuredProduct : featuredProduct != null ? true : false,
-                    bestSeller : bestSeller != null ? true : false,
-                    offered : offered != null ? true : false
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.error){
-                    setError(data.message);
-                }
-                else{
-                    setError(null);
-                    router.push('/admin')
-                }
-            })
-        }
-    }
-
-    const handleReset = () => {
+    } else {
         setPreviewImage(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''; // Reset file input value
-        }
+    }
+};
+
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const productName = formData.get('name');
+    const productPrice = formData.get('price');
+    const offProduct = formData.get('offer');
+    const availability = formData.get('availability');
+    const productDescription = formData.get('description');
+    const category = formData.get('categoryId');
+    const featuredProduct = formData.get('featured');
+    const bestSeller = formData.get('bestSeller');
+    const offered = formData.get('offered');
+    const file = formData.get('imagePath');
+    
+    if (!productName || !productPrice || !offProduct || !availability || !productDescription || !category || !file) {
+        console.log(productName, productPrice, offProduct, availability, productDescription, category, featuredProduct, bestSeller, offered);
+        setError('All fields are required');
+        return;
+    }
+    else{
+        fetch(API_URL + '/api/product', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token') || '')}`
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.error){
+                setError(data.message);
+            }
+            else{
+                setError(null);
+                router.push('/admin')
+            }
+        })
+    }
+}
+
+const handleReset = () => {
+    setPreviewImage(null);
+    if (fileInputRef.current) {
+        fileInputRef.current.value = ''; // Reset file input value
+    }
     };
 
-    const options = categories.map((category) => {
+    const options = categories.map((category : any) => {
         return {
-            value: category.id,
+            value: category._id,
             label: category.name
         }
     })
+    
+    if(!isAdmin) return null
 
     return (
         <LayoutAdmin>
@@ -124,7 +122,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Product Name"
                                 placeholder="Product Name"
                                 id='productName'
-                                name='productName'
+                                name='name'
                                 type='text'
                                 required
                                 className='w-full'
@@ -135,7 +133,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Product Price"
                                 placeholder="Product Price"
                                 id='productPrice'
-                                name='productPrice'
+                                name='price'
                                 type='number'
                                 required
                                 className='w-full'
@@ -148,7 +146,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Off on product (%)"
                                 placeholder="0 to 100"
                                 id='offProduct'
-                                name='offProduct'
+                                name='offer'
                                 type='number'
                                 required
                                 className='w-full'
@@ -175,7 +173,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Product Description"
                                 placeholder="Product Description"
                                 id='productDescription'
-                                name='productDescription'
+                                name='description'
                                 required
                                 className='w-full'
                                 rows={5}
@@ -187,7 +185,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                         <div className="" >
                             <CustomSelect
                                 options={options}
-                                name='category'
+                                name='categoryId'
                                 className='w-full'
                                 id='category'
                                 label='Select Category'
@@ -198,7 +196,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Product Image"
                                 placeholder="Product Image"
                                 id='productImage'
-                                name='productImage'
+                                name='imagePath'
                                 type='file'
                                 required
                                 className='w-full'
@@ -213,7 +211,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Is Product Featured?"
                                 placeholder="Is Product Featured?"
                                 id='featuredProduct'
-                                name='featuredProduct'
+                                name='featured'
                                 type='checkbox'
                                 className=''
                             />
@@ -235,7 +233,7 @@ const AddProduct = ({categories} : AddProductProps) => {
                                 label="Does product have discount?"
                                 placeholder="Does product have discount?"
                                 id='offers'
-                                name='offers'
+                                name='offered'
                                 type='checkbox'
                                 className=''
                             />
@@ -268,31 +266,3 @@ const AddProduct = ({categories} : AddProductProps) => {
 }
 
 export default AddProduct
-
-export async function getServerSideProps(context:any) {
-
-    const redr = {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-    }
-    const cookies = cookie.parse(context.req.headers.cookie || '');
-    const token = cookies.token;
-    if(!token){
-        return redr
-    }
-    const admin = await checkIfAdminExist2(token);
-    if (!admin) {
-        return redr
-    }
-
-    const prisma = new PrismaClient()
-    const categories = await prisma.category.findMany()
-    await prisma.$disconnect()
-    return {
-        props: {
-            categories : JSON.parse(JSON.stringify(categories))
-        }
-    }
-}

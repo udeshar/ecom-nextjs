@@ -3,8 +3,6 @@ import Layout from '@/components/layout/Layout'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import Image from 'next/image'
 import ReactStars from "react-rating-stars-component";
-import Review from '@/components/common/review/Review';
-import OverallRating from '@/components/product/OverallRating';
 import { PrismaClient, User, product } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCartContext } from '@/context/cartContext';
@@ -13,14 +11,17 @@ import { useUserContext } from '@/context/userContext';
 import AddReview from '@/components/product/AddReview';
 import BtnUnderline from '@/components/common/custom-button/BtnUnderline';
 import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
+import { getAllCategories, getAllProducts, getProductByProductName } from '@/services/api';
 
-const ProductCard = ({product, reviewsData} : {product : product, reviewsData : any}) => {
+const ProductCard = ({product} : {product : product}) => {
     const router = useRouter();
     const {addItem, items} = useCartContext();
     const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
     const {user} : {user : User | null} = useUserContext();
     const {category, product: productName} = router.query;
-    const [reviews, setReviews] = useState<any>(reviewsData || []);
+    // const [reviews, setReviews] = useState<any>(reviewsData || []);
+    const [reviews, setReviews] = useState<any>([]);
+
     const [alredyReviewed, setAlredyReviewed] = useState<boolean>(false);
 
     const isItemExist = items?.find((item : any) => item.product.id === product.id);
@@ -39,6 +40,80 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
         })
         .catch(err => console.log(err))
     }
+
+    // function removeDuplicates(inputArray : any) {
+    //     const seen:any = {}; // We'll use an object to keep track of seen objects
+    //     const result : any = [];
+    
+    //     // Loop through each object in the input array
+    //     inputArray.forEach((obj : any) => {
+    //         const key = JSON.stringify(obj); // Convert the object to a string
+    
+    //         // If we haven't seen this object before, add it to the result array
+    //         if (!seen[key]) {
+    //             result.push(obj);
+    //             seen[key] = true; // Mark this object as seen
+    //         }
+    //     });
+    
+    //     return result; // Return the array with duplicates removed
+    // }
+
+    useEffect(() => {
+        // const result = removeDuplicates(
+        //     [
+        //         {a: 5},
+        //         {a: 5},
+        //         {c: 10},
+        //         {c: 10},
+        //         {b: 20, d: 25},
+        //         {b: 20, d: 25},
+        //         {a: 5, b: 20, c: 10, d: 25}
+        //     ]
+        // )
+        // console.log(result, "***********************")
+
+        //function debounce(func : any, ms : any) {
+        //   let timeout : any;
+        //    return function() {
+        //      clearTimeout(timeout);
+        //      timeout = setTimeout(() => func.apply(this, arguments), ms);
+        //    };
+        //  }
+        
+        //  const temp = debounce(
+       //     ()=>{
+        //      alert("hello")
+        //    },
+        //    3000
+        //  )
+
+    }, [])
+
+    function debouncetest(func : any, ms : any) {
+        let timeout : any;
+        return function() {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => func.apply(this, arguments), ms);
+        };
+    }
+    function debounce(func, delay) {
+        let timeoutId;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(context, args);
+            }, delay);
+        };
+    }
+
+    function myFunction() {
+        console.log('This function will be debounced');
+    }
+
+    const debouncedFunction = debounce(myFunction, 300);
 
     useEffect(() => {
         if(user){
@@ -65,6 +140,10 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                     </div>
                     <div className='col-span-3' >
                         <h1 className="text-xl font-medium" >{product?.name}</h1>
+                        <button onClick={()=>{
+                            console.log("hello")
+                            debouncedFunction();
+                        }} >click here</button>
                         <div className="flex items-center gap-3 mt-3" >
                            <ReactStars
                                 count={5}
@@ -128,7 +207,7 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                                 </>
                             )
                         }
-                        {
+                        {/* {
                             reviews.length > 0 &&
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-8 my-10 mt-10" >
@@ -145,7 +224,7 @@ const ProductCard = ({product, reviewsData} : {product : product, reviewsData : 
                                     </div>
                                 </div>
                             </>
-                        }
+                        } */}
                         
                     </div>
                 </div>
@@ -161,28 +240,30 @@ export async function getStaticProps({params} : any) {
 
     const product = params.product;
 
-    const prisma = new PrismaClient();
-    const productData = await prisma.product.findUnique({
-        where: {
-            name: product
-        }
-    });
+    const productData = await getProductByProductName(product);
 
-    const reviews = await prisma.review.findMany({
-        where: {
-            productId: productData?.id
-        },
-        include: {
-            user: true
-        }
-    });
+    // const prisma = new PrismaClient();
+    // const productData = await prisma.product.findUnique({
+    //     where: {
+    //         name: product
+    //     }
+    // });
 
-    await prisma.$disconnect();
+    // const reviews = await prisma.review.findMany({
+    //     where: {
+    //         productId: productData?.id
+    //     },
+    //     include: {
+    //         user: true
+    //     }
+    // });
+
+    // await prisma.$disconnect();
 
     return {
         props: {
-            product : JSON.parse(JSON.stringify(productData)),
-            reviewsData : JSON.parse(JSON.stringify(reviews))
+            product : productData
+            // reviewsData : JSON.parse(JSON.stringify(reviews))
         },
         revalidate: 30
     }
@@ -190,8 +271,11 @@ export async function getStaticProps({params} : any) {
 
 export async function getStaticPaths() {
     const prisma = new PrismaClient();
-    const products = await prisma.product.findMany();
-    const categories = await prisma.category.findMany();
+    // const products = await prisma.product.findMany();
+    // const categories = await prisma.category.findMany();
+
+    const products = await getAllProducts();
+    const categories = await getAllCategories();
 
     const paths = products.map((product : any) => {
         return {
@@ -201,8 +285,6 @@ export async function getStaticPaths() {
             }
         }
     });
-
-    await prisma.$disconnect();
 
     return {
         paths,

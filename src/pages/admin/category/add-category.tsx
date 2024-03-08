@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
 import Container from '@/components/common/container/Container'
 import CustomInput from '@/components/common/custom-input/CustomInput'
@@ -9,15 +9,23 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useRouter } from 'next/router'
-import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie';
+import { useUserContext } from '@/context/userContext'
+import { useCategoriesContext } from '@/context/categoryContext'
+import { API_URL } from '@/helpers/constants'
 
 const AddCategory = () => {
-
+    
+    const [isAdmin, setIsAdmin] = useState(false);
+    const { isAdminLoggedIn } = useUserContext()
+    const { getCategories } = useCategoriesContext()
     const router = useRouter();
     const [previewImage, setPreviewImage] = useState<string| ArrayBuffer | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | null>(null);
+    
+    useEffect(() => {
+      isAdminLoggedIn(()=>{ setIsAdmin(true) }, () => {router.push('/login')})
+    }, [])
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files && e.target.files[0];
@@ -50,8 +58,10 @@ const AddCategory = () => {
             return;
         }
         const formData = new FormData(e.target as HTMLFormElement);
-        const name = formData.get("categoryName") as string;
-        const description = formData.get("categoryDescription") as string;
+        const name = formData.get("name") as string;
+        const description = formData.get("description") as string;
+        // const categoryImage = formData.get("categoryImage") as File;
+
 
         if(!name || !description) {
             setError("Please fill all the fields")
@@ -59,12 +69,12 @@ const AddCategory = () => {
         }
         else{
             setError(null)
-            fetch('/api/category', {
+            fetch(API_URL + '/api/category', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''), 
                 },
-                body: JSON.stringify({name, description, image: previewImage}),
+                body: formData,
             })
             .then((res) => res.json())
             .then((data) => {
@@ -72,6 +82,7 @@ const AddCategory = () => {
                     setError(data.error);
                     return;
                 }
+                getCategories()
                 router.push('/admin');
             })
             .catch((error) => {
@@ -88,6 +99,8 @@ const AddCategory = () => {
         }
     };
 
+    if(!isAdmin) return null
+
   return (
     <LayoutAdmin>
         <Container className="my-8 relative" >
@@ -99,7 +112,7 @@ const AddCategory = () => {
                             label="Category Name" 
                             placeholder="Category Name" 
                             id='categoryName' 
-                            name='categoryName' 
+                            name='name' 
                             type='text'
                             required
                             className='w-full mb-4'
@@ -108,7 +121,7 @@ const AddCategory = () => {
                             label="Category Description" 
                             placeholder="Category Description" 
                             id='categoryDescription' 
-                            name='categoryDescription' 
+                            name='description' 
                             required
                             className='w-full mb-4'
                             rows={5}
@@ -154,24 +167,3 @@ const AddCategory = () => {
 }
 
 export default AddCategory
-
-export async function getServerSideProps(context:any) {
-    const redr = {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-    }
-    const cookies = cookie.parse(context.req.headers.cookie || '');
-    const token = cookies.token;
-    if(!token){
-        return redr
-    }
-    const admin = await checkIfAdminExist2(token);
-    if (!admin) {
-        return redr
-    }
-    return {
-        props: {}
-    }
-}

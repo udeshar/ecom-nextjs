@@ -1,4 +1,5 @@
 import { useContext, createContext, FC, useState, useEffect } from "react";
+import { API_URL } from "@/helpers/constants";
 
 const UserContext = createContext({
     user: null,
@@ -11,6 +12,8 @@ const UserContext = createContext({
     updateAddress: (address, callback, onError) => {},
     deleteAddress: (addressId, callback, onError) => {},
     placeOrder: (order, callback, onError) => {},
+    isAdminLoggedIn: (callback, onError) => {},
+    isUserLoggedIn: (callback, onError) => {},
 });
 
 export const useUserContext = () => {
@@ -23,7 +26,7 @@ export const UserProvider = ({ children }) => {
 
     async function login(email, password, callback, onError){
         try {
-            fetch('/api/auth/login', {
+            fetch(API_URL + '/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,11 +35,12 @@ export const UserProvider = ({ children }) => {
             })
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 if(data?.error){
                     onError(data?.message)
                 } else{
-                    setUser(data);
-                    localStorage.setItem('token', JSON.stringify(data?.token));
+                    // setUser(data);
+                    localStorage.setItem('token', JSON.stringify(data?.accessToken));
                     callback(data);
                 }
             })
@@ -47,7 +51,7 @@ export const UserProvider = ({ children }) => {
 
     async function logout(callback){
         setUser(null);
-        fetch('/api/auth/logout', {
+        fetch(API_URL + '/api/auth/logout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,11 +72,11 @@ export const UserProvider = ({ children }) => {
 
     async function getUser(){
         try {
-            fetch('/api/user', {
+            fetch(API_URL + '/api/user', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') || '',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             })
             .then(response => response.json())
@@ -80,7 +84,7 @@ export const UserProvider = ({ children }) => {
                 if(data?.error){
                     logout(()=>{});
                 } else{
-                    setUser(data.user);
+                    setUser(data);
                 }
             })
         } catch (error) {
@@ -90,7 +94,7 @@ export const UserProvider = ({ children }) => {
 
     async function getAllAddresses(callback, onError){
         try {
-            fetch('/api/user/address', {
+            fetch(API_URL + '/api/address', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -112,7 +116,7 @@ export const UserProvider = ({ children }) => {
 
     async function addAddress(address, callback, onError){
         try {
-            fetch('/api/user/address', {
+            fetch(API_URL + '/api/address', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -134,12 +138,11 @@ export const UserProvider = ({ children }) => {
 
     async function deleteAddress(addressId, callback, onError){
         try {
-            fetch('/api/user/address', {
+            fetch(API_URL + '/api/address/' + addressId, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({id : addressId}),
             })
             .then(response => response.json())
             .then(data => {
@@ -156,7 +159,7 @@ export const UserProvider = ({ children }) => {
 
     async function updateAddress(address, callback, onError){
         try {
-            fetch('/api/user/address', {
+            fetch(API_URL + '/api/address/' + address._id, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -178,7 +181,7 @@ export const UserProvider = ({ children }) => {
 
     async function placeOrder(order, callback, onError){
         try {
-            fetch('/api/order', {
+            fetch(API_URL + '/api/order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -198,12 +201,60 @@ export const UserProvider = ({ children }) => {
         }
     }
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if(token){
-            getUser();
+    async function isAdminLoggedIn(callback, onError){
+        try {
+            console.log("here")
+            fetch(API_URL + '/api/user/verify-admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => {
+                if(response.status === 401){
+                    onError();
+                }
+                else{
+                    callback();
+                }
+            })
         }
-    }, []);
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function isUserLoggedIn(callback, onError){
+        try {
+            fetch(API_URL + '/api/user/verify-user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token') || '',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data?.error){
+                    onError(data?.message)
+                } else{
+                    callback(data);
+                }
+            })
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    // useEffect(() => {
+    //     const token = localStorage.getItem('token');
+    //     if(token){
+    //         getUser();
+    //     }
+    // }, []);
 
     const values = {
         user,
@@ -215,7 +266,9 @@ export const UserProvider = ({ children }) => {
         addAddress,
         updateAddress,
         deleteAddress,
-        placeOrder
+        placeOrder,
+        isAdminLoggedIn,
+        isUserLoggedIn,
     };
 
     return (

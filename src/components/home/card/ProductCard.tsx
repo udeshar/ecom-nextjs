@@ -4,7 +4,6 @@ import ReactStars from "react-rating-stars-component";
 import styles from "./card.module.css";
 import BtnUnderline from "@/components/common/custom-button/BtnUnderline";
 import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
-import { cart, cartItems, product } from "@prisma/client";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { useRouter } from "next/router";
@@ -12,8 +11,9 @@ import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useCartContext } from "@/context/cartContext";
 import { useWishlistContext } from "@/context/wishlistContext";
+import { API_URL } from "@/helpers/constants";
 
-const ProductCard = ({product, user, categoryName} : {product : product, user : "Admin" | "User", categoryName? : string}) => {
+const ProductCard = ({product, user, categoryName} : {product : any, user : "Admin" | "User", categoryName? : string}) => {
 
   const router = useRouter();
   const ratingChanged = (newRating: any) => {
@@ -30,11 +30,11 @@ const ProductCard = ({product, user, categoryName} : {product : product, user : 
   }
 
   const deleteHandler = () => {
-    fetch('/api/product/'+ product.id, {
+    fetch( API_URL + '/api/product/'+ product._id, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem('token') || ''
+            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || '')
         }
     })
     .then(res => res.json())

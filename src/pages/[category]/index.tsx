@@ -5,8 +5,8 @@ import CustomSelect from '@/components/common/custom-input/CustomSelect'
 import CustomInput from '@/components/common/custom-input/CustomInput'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import { BiSearch } from 'react-icons/bi'
-import { PrismaClient } from '@prisma/client'
 import { useRouter } from 'next/router'
+import { getProductByCategoryName, getAllCategories, getCategoryByName } from '@/services/api'
 
 const Index = ({products} : {products : any}) => {
 
@@ -56,41 +56,48 @@ export default Index
 
 export async function getStaticProps({params} : any) {
     const category = params.category;
-    const prisma = new PrismaClient()
 
-    const categoryData = await prisma.category.findUnique({
-        where : {
-            name : category
-        }
-    })
-    if(!categoryData) {
-        await prisma.$disconnect()
-        return {
-            notFound : true
-        }
-    }
-    const products = await prisma.product.findMany({
-        where : {
-            categoryId : categoryData?.id
-        },
-        include : {
-            category : true
-        }
-    })
-    await prisma.$disconnect()
+    // const categoryData = await get(category);
+    // if(!categoryData) {
+    //     return {
+    //         notFound : true
+    //     }
+    // }
+
+    const products = await getProductByCategoryName(category)
+
+    // const categoryData = await prisma.category.findUnique({
+    //     where : {
+    //         name : category
+    //     }
+    // })
+    // if(!categoryData) {
+    //     await prisma.$disconnect()
+    //     return {
+    //         notFound : true
+    //     }
+    // }
+    // const products = await prisma.product.findMany({
+    //     where : {
+    //         categoryId : categoryData?.id
+    //     },
+    //     include : {
+    //         category : true
+    //     }
+    // })
+    // await prisma.$disconnect()
     return {
       props: {
-        products : JSON.parse(JSON.stringify(products))
+        products : products
       },
     };
 }
 
 export async function getStaticPaths() {
-    const prisma = new PrismaClient()
-    const categories = await prisma.category.findMany()
-    const paths = categories.map((category) => ({
+    // const prisma = new PrismaClient()
+    const categories = await getAllCategories();
+    const paths = categories.map((category : any) => ({
       params: { category: category.name },
     }))
-    await prisma.$disconnect()
     return { paths, fallback: 'blocking' }
 }

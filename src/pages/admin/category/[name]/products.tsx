@@ -1,26 +1,35 @@
-import React from 'react'
-import Layout from '@/components/layout/Layout'
+import React, { useEffect, useState } from 'react'
 import CategoryProduct from '@/components/category/categoryProduct/CategoryProduct'
 import CustomSelect from '@/components/common/custom-input/CustomSelect'
 import CustomInput from '@/components/common/custom-input/CustomInput'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import { BiSearch } from 'react-icons/bi'
 import { useRouter } from 'next/router'
-import { PrismaClient, product } from '@prisma/client'
 import { Button } from 'flowbite-react'
 import Link from 'next/link'
-import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
+import { useProductsContext } from '@/context/productContext'
+import { useUserContext } from '@/context/userContext'
 
-interface IAdminProps {
-    products: product[]
-}
-
-const AdminProducts = ({products} : IAdminProps) => {
+const AdminProducts = () => {
 
     const router = useRouter();
     const { name } = router.query;
+    const [isAdmin, setIsAdmin] = useState(false);
+    const { categoryProducts, getProductByQuery } = useProductsContext();
+    const { isAdminLoggedIn } = useUserContext()
+
+    useEffect(() => {
+        isAdminLoggedIn(()=>{ setIsAdmin(true)}, () => {router.push('/login')})
+    }, [])
+
+    useEffect(() => {
+        if(router.query.name){
+            getProductByQuery(`category=${name}`)
+        }
+    }, [router.query.name])
+
+      if(!isAdmin) return null
 
   return (
     <LayoutAdmin>
@@ -53,7 +62,7 @@ const AdminProducts = ({products} : IAdminProps) => {
                     <button className="bg-blue-400 text-white px-3 py-2 rounded-md" ><BiSearch size={20} /></button>
                 </div>
             </div>
-            <CategoryProduct products={products} user={"Admin"} categoryName={name as string} />
+            <CategoryProduct products={categoryProducts} user={"Admin"} categoryName={name as string} />
             <div className='flex justify-start my-8 pt-5'>
                 <Link href='/admin/add-product'>
                     <Button  >
@@ -68,53 +77,3 @@ const AdminProducts = ({products} : IAdminProps) => {
 }
 
 export default AdminProducts
-
-export async function getServerSideProps(context:any){
-
-    const redr = {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-    }
-    const cookies = cookie.parse(context.req.headers.cookie || '');
-    const token = cookies.token;
-    if(!token){
-        return redr
-    }
-    const admin = await checkIfAdminExist2(token);
-    if (!admin) {
-        return redr
-    }
-
-    const {name} = context.params;
-
-    const prisma = new PrismaClient();
-
-    console.log(name);
-
-    const category = await prisma.category.findUnique({
-        where: {
-            name: name
-        }
-    });
-
-    if (!category) {
-        console.log(category, "*****************")
-        return {
-            notFound: true
-        }
-    }
-
-    const products = await prisma.product.findMany({
-        where: {
-            categoryId: category.id
-        }
-    })
-    await prisma.$disconnect();
-    return {
-        props: {
-            products : JSON.parse(JSON.stringify(products)),
-        }
-    }
-}

@@ -16,10 +16,10 @@ const Navbar: React.FC = () => {
     const { items : wishItems } = useWishlistContext();
 
     const router = useRouter();
-    // useEffect(() => {
-    //     // getUser();
-    //     // getCartItems();
-    // }, [])
+    useEffect(() => {
+        getUser();
+        // getCartItems();
+    }, [])
     
 
     return (

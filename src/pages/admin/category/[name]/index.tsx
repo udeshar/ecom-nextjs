@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import LayoutAdmin from '@/components/layout/LayoutAdmin'
 import Container from '@/components/common/container/Container'
 import CustomInput from '@/components/common/custom-input/CustomInput'
@@ -9,23 +9,38 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { Toast } from 'flowbite-react';
 import { HiX } from 'react-icons/hi';
 import { useRouter } from 'next/router'
-import { PrismaClient, category } from '@prisma/client'
-import { checkIfAdminExist2 } from '@/helpers/dbUtils'
-import cookie from 'cookie';
+import { useCategoriesContext } from '@/context/categoryContext'
+import { API_URL } from '@/helpers/constants'
+import { useUserContext } from '@/context/userContext'
 
-interface IAdminProps {
-    category: category
-}
 
-const ManageCategory = ({category} : IAdminProps) => {
+const ManageCategory = () => {
 
     const router = useRouter();
+    const { categories, getCategories } = useCategoriesContext();
+    const [category, setCategory] = useState<any>(null);
     const [previewImage, setPreviewImage] = useState<string| ArrayBuffer | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [error, setError] = useState<string | null>(null);
     const [name, setName] = useState<string>(category?.name);
     const [description, setDescription] = useState<string>(category?.description || "");
     const [image, setImage] = useState<string>(category?.imagePath || "");
+
+    const [isAdmin, setIsAdmin] = useState(false);
+    const { isAdminLoggedIn } = useUserContext()
+
+    useEffect(() => {
+        isAdminLoggedIn(()=>{ setIsAdmin(true)}, () => {router.push('/login')})
+    }, [])
+
+    useEffect(() => {
+        const cat:any = categories.find((item : any) => item.name === router.query.name)
+        setCategory(cat);
+        setName(cat?.name);
+        setDescription(cat?.description);
+        setImage(cat?.imagePath);
+        console.log(cat);
+    }, [router.query.name, categories])
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files && e.target.files[0];
@@ -53,13 +68,10 @@ const ManageCategory = ({category} : IAdminProps) => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        // if (!previewImage) {
-        //     setError('Please select a PNG image.');
-        //     return;
-        // }
         const formData = new FormData(e.target as HTMLFormElement);
-        const name = formData.get("categoryName") as string;
-        const description = formData.get("categoryDescription") as string;
+        const name = formData.get("name") as string;
+        const description = formData.get("description") as string;
+        formData.append('imagePath', image);
 
         if(!name || !description) {
             setError("Please fill all the fields")
@@ -67,17 +79,21 @@ const ManageCategory = ({category} : IAdminProps) => {
         }
         else{
             setError(null)
-            fetch('/api/category', {
+            fetch(API_URL + '/api/category/' + category?._id, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                    'Authorization' : `Bearer ${JSON.parse(localStorage.getItem('token') || '')}`
                 },
-                body: JSON.stringify({id: category.id ,name, description, imagePath : image, file : previewImage}),
+                body: formData,
             })
             .then((res) => res.json())
             .then((data) => {
                 console.log(data);
+                if(data.error){
+                    setError(data.message);
+                    return;
+                }
+                getCategories()
                 router.push('/admin');
             })
             .catch((error) => {
@@ -96,11 +112,11 @@ const ManageCategory = ({category} : IAdminProps) => {
     };
 
     const deleteCategory = () => {
-        fetch(`/api/category?id=${category.id}`, {
+        fetch(API_URL + `/api/category/${category.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : `Bearer ${localStorage.getItem('token')}`
+                'Authorization' : `Bearer ${JSON.parse(localStorage.getItem('token') || '')}`
             },
         })
         .then((res) => res.json())
@@ -112,6 +128,8 @@ const ManageCategory = ({category} : IAdminProps) => {
             console.error('Error:', error);
         });
     }
+
+    if(!isAdmin) return null
 
   return (
     <LayoutAdmin>
@@ -126,7 +144,7 @@ const ManageCategory = ({category} : IAdminProps) => {
                             onChange={(e) => setName(e.target.value)}
                             placeholder="Category Name" 
                             id='categoryName' 
-                            name='categoryName' 
+                            name='name' 
                             type='text'
                             required
                             className='w-full mb-4'
@@ -137,7 +155,7 @@ const ManageCategory = ({category} : IAdminProps) => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             id='categoryDescription' 
-                            name='categoryDescription' 
+                            name='description' 
                             required
                             className='w-full mb-4'
                             rows={5}
@@ -196,42 +214,3 @@ const ManageCategory = ({category} : IAdminProps) => {
 }
 
 export default ManageCategory
-
-export async function getServerSideProps(context:any) {
-
-    const redr = {
-        redirect: {
-          destination: '/login',
-          permanent: false,
-        },
-    }
-    const cookies = cookie.parse(context.req.headers.cookie || '');
-    const token = cookies.token;
-    if(!token){
-        return redr
-    }
-    const admin = await checkIfAdminExist2(token);
-    if (!admin) {
-        return redr
-    }
-
-    const {name} = context.params;
-    
-    const prisma = new PrismaClient();
-    const category = await prisma.category.findUnique({
-        where: {
-            name
-        }
-    });
-    await prisma.$disconnect();
-    if (!category) {
-        return {
-            notFound: true
-        };
-    }
-    return {
-        props: {
-            category: JSON.parse(JSON.stringify(category))
-        }
-    }
-}
