@@ -1,9 +1,32 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import CustomInput from "./CustomInput";
 import CustomSelect from "./CustomSelect";
 import { IoIosSearch } from "react-icons/io";
+// import { PrismaClient } from "@prisma/client";
 
 const SelectInputBtn = () => {
+
+  const [categories, setCategories] = useState<any>([]);
+
+  const getAllCategories = async () => {
+      // const prisma = new PrismaClient();
+      // const categories = await prisma.category.findMany();
+      fetch("http://localhost:3000/api/categories")
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        setCategories(data);
+      })
+      // setCategories(categories);
+      console.log(categories);
+      // await prisma.$disconnect();
+  }
+
+  useEffect(() => {
+    // getAllCategories();
+  }, [])
+  
+
   return (
     <div className="flex justify-between items-center border border-slate-200 dark:border-slate-600 custom-input-select-wrapper rounded-md w-full">
       <div className="border-r border-slate-200 dark:border-slate-600 w-32">
