@@ -5,18 +5,9 @@ import OfferCard from "@/components/home/card/OfferCard";
 import ProductList from "@/components/home/product-list/ProductList";
 import styles from './styles.module.css'
 import ExploreCategory from "@/components/home/explore-category/ExploreCategory";
-import { PrismaClient, category, product } from "@prisma/client";
 import { getAllCategories, getAllProducts } from "@/services/api";
 
-interface Props {
-  categories: category[];
-  products: product[];
-  faeturedProducts: product[];
-  bestSeller: product[];
-  offered: product[];
-}
-
-export default function Home({categories, products, bestSeller, faeturedProducts, offered} : Props) {
+export default function Home({categories, products, bestSeller, faeturedProducts, offered} : any) {
   return (
     <Layout>
       <Container className={"my-5 mt-8"}>

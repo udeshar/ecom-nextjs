@@ -14,7 +14,7 @@ const WishlistItem = ({item} : {item : any}) => {
     const [openModal, setOpenModal] = useState(false);
 
     const removeItem = () => {
-        deletewishlist({id: item.id});
+        deletewishlist(item.product);
         setOpenModal(false);
     }
 

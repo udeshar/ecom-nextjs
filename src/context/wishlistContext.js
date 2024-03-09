@@ -1,5 +1,6 @@
 import { useContext, createContext, FC, useState, useEffect } from "react";
 import { useAppContext } from "./appContext";
+import { API_URL } from "@/helpers/constants";
 
 const WishlistContext = createContext({
     items : [],
@@ -25,10 +26,11 @@ export const WishlistProvider = ({ children }) => {
                 return;
             }
             showToast('Adding item to wishlist', 'Pending');
-            const response = await fetch('/api/wishlist', {
+            const response = await fetch(API_URL + '/api/wishlist/add-wishlist-item', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
                 body: JSON.stringify({productId : item}),
             });
@@ -47,10 +49,11 @@ export const WishlistProvider = ({ children }) => {
 
     const getWishlistItems = async () => {
         try {
-            const response = await fetch('/api/wishlist', {
+            const response = await fetch(API_URL + '/api/wishlist/wishlist-items', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             });
             const data = await response.json();
@@ -65,10 +68,11 @@ export const WishlistProvider = ({ children }) => {
     const deletewishlist = async (item) => {
         try {
             showToast('Removing item from wishlist', 'Pending');
-            fetch('/api/wishlist/'+item.id, {
+            fetch(API_URL + '/api/wishlist/delete-wishlist-item/'+item._id, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             })
             .then(response => response.json())
@@ -86,13 +90,12 @@ export const WishlistProvider = ({ children }) => {
         }
     };
 
-    // useEffect(() => {
-    //     const token = localStorage.getItem('token');
-    //     if(token){
-    //         console.log('token', token);
-    //         getWishlistItems();
-    //     }
-    // }, []);
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if(token){
+            getWishlistItems();
+        }
+    }, []);
 
     const values = {
         items : items,

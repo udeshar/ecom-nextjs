@@ -1,18 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import CartItem from '@/components/cart/CartItem'
-import { PrismaClient, cartItems } from '@prisma/client'
-import cookie from 'cookie';
-import { checkIfUserExist2 } from '@/helpers/dbUtils'
-import { v4 as uuidv4 } from 'uuid';
 import { useCartContext } from '@/context/cartContext'
 import { useRouter } from 'next/router';
+import { useUserContext } from '@/context/userContext'
 
 const Cart = () => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const {items} = useCartContext();
+  const {items, getCartItems} = useCartContext();
+  const { isUserLoggedIn } = useUserContext();
+  const [ isUser, setIsUser ] = useState(false)
   const router = useRouter();
+
+  useEffect(() => {
+    isUserLoggedIn(()=>{ setIsUser(true) }, () => {router.push('/login')})
+  }, [])
+  
+    useEffect(() => {
+      getCartItems();
+    }, [])
+    
+    if(!isUser) return null
 
   return (
     <Layout>
@@ -38,45 +47,3 @@ const Cart = () => {
 }
 
 export default Cart
-
-export const getServerSideProps = async (context : any) => {
-  const redr = {
-    redirect: {
-      destination: '/login',
-      permanent: false,
-    },
-  }
-
-  const cookies = cookie.parse(context.req.headers.cookie || '');
-  const token = cookies.token;
-  if(!token){
-    return redr
-  }
-
-  const user = await checkIfUserExist2(token);
-  if (!user) {
-    return redr
-  }
-
-  const prisma = new PrismaClient();
-  const cart = await prisma.cart.findUnique({
-      where: {
-          userId: user.id,
-      }
-  });
-
-  if(!cart){
-    await prisma.cart.create({
-      data: {
-        id: uuidv4(),
-        userId: user.id
-      }
-    })
-  }
-  await prisma.$disconnect();
-  return {
-      props: {
-          
-      },
-  }
-}

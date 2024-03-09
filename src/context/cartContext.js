@@ -1,5 +1,6 @@
 import { useContext, createContext, FC, useState, useEffect } from "react";
 import { useAppContext } from "./appContext";
+import { API_URL } from "@/helpers/constants";
 
 const CartContext = createContext({
     items : [],
@@ -26,12 +27,13 @@ export const CartProvider = ({ children }) => {
                 return;
             }
             showToast('Adding item to cart', 'Pending');
-            const response = await fetch('/api/cart', {
+            const response = await fetch(API_URL + '/api/cart/add-item', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
-                body: JSON.stringify({productId : item}),
+                body: JSON.stringify({productId : item, quantity : 1}),
             });
             const data = await response.json();
             if(data.error){
@@ -48,10 +50,11 @@ export const CartProvider = ({ children }) => {
 
     const getCartItems = async () => {
         try {
-            const response = await fetch('/api/cart', {
+            const response = await fetch(API_URL + '/api/cart/items', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             });
             const data = await response.json();
@@ -66,10 +69,11 @@ export const CartProvider = ({ children }) => {
     const removeItem = async (item, qty) => {
         try {
             showToast('Removing item from cart', 'Pending');
-            fetch('/api/cart/'+item.id, {
+            fetch(API_URL + '/api/cart/update-item/'+item.product._id, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
                 body: JSON.stringify({quantity : qty}),
             })
@@ -92,10 +96,11 @@ export const CartProvider = ({ children }) => {
         try {
             if(item.quantity == 0)
                 showToast('Removing item from cart', 'Pending');
-            fetch('/api/cart/'+item.id, {
+            fetch(API_URL + '/api/cart/update-item/'+item.id, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
                 body: JSON.stringify({quantity : item.quantity}),
             })
@@ -112,12 +117,12 @@ export const CartProvider = ({ children }) => {
         }
     };
 
-    // useEffect(() => {
-    //     const token = localStorage.getItem('token');
-    //     if(token){
-    //         getCartItems();
-    //     }
-    // }, []);
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if(token){
+            getCartItems();
+        }
+    }, []);
 
     const values = {
         items : items,

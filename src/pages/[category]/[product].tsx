@@ -3,7 +3,6 @@ import Layout from '@/components/layout/Layout'
 import BreadCrumd from '@/components/category/breadCrumd/BreadCrumd'
 import Image from 'next/image'
 import ReactStars from "react-rating-stars-component";
-import { PrismaClient, User, product } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { useCartContext } from '@/context/cartContext';
 import { useWishlistContext } from '@/context/wishlistContext';
@@ -13,19 +12,19 @@ import BtnUnderline from '@/components/common/custom-button/BtnUnderline';
 import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
 import { getAllCategories, getAllProducts, getProductByProductName } from '@/services/api';
 
-const ProductCard = ({product} : {product : product}) => {
+const ProductCard = ({product} : {product : any}) => {
     const router = useRouter();
     const {addItem, items} = useCartContext();
     const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
-    const {user} : {user : User | null} = useUserContext();
+    const {user} : {user : any} = useUserContext();
     const {category, product: productName} = router.query;
     // const [reviews, setReviews] = useState<any>(reviewsData || []);
     const [reviews, setReviews] = useState<any>([]);
 
     const [alredyReviewed, setAlredyReviewed] = useState<boolean>(false);
 
-    const isItemExist = items?.find((item : any) => item.product.id === product.id);
-    const data:any = wishlistItems?.filter((item : any) => item.product.id === product.id)
+    const isItemExist = items?.find((item : any) => item.product._id === product._id);
+    const data:any = wishlistItems?.filter((item : any) => item.product._id === product._id)
 
     const getReviews = async  () => {
         fetch(`/api/product/${product.id}/review`,{
@@ -59,7 +58,7 @@ const ProductCard = ({product} : {product : product}) => {
     //     return result; // Return the array with duplicates removed
     // }
 
-    useEffect(() => {
+    // useEffect(() => {
         // const result = removeDuplicates(
         //     [
         //         {a: 5},
@@ -88,32 +87,32 @@ const ProductCard = ({product} : {product : product}) => {
         //    3000
         //  )
 
-    }, [])
+    // }, [])
 
-    function debouncetest(func : any, ms : any) {
-        let timeout : any;
-        return function() {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => func.apply(this, arguments), ms);
-        };
-    }
-    function debounce(func, delay) {
-        let timeoutId;
-        return function() {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                func.apply(context, args);
-            }, delay);
-        };
-    }
+    // function debouncetest(func : any, ms : any) {
+    //     let timeout : any;
+    //     return function() {
+    //       clearTimeout(timeout);
+    //       timeout = setTimeout(() => func.apply(this, arguments), ms);
+    //     };
+    // }
+    // function debounce(func, delay) {
+    //     let timeoutId;
+    //     return function() {
+    //         const context = this;
+    //         const args = arguments;
+    //         clearTimeout(timeoutId);
+    //         timeoutId = setTimeout(() => {
+    //             func.apply(context, args);
+    //         }, delay);
+    //     };
+    // }
 
-    function myFunction() {
-        console.log('This function will be debounced');
-    }
+    // function myFunction() {
+    //     console.log('This function will be debounced');
+    // }
 
-    const debouncedFunction = debounce(myFunction, 300);
+    // const debouncedFunction = debounce(myFunction, 300);
 
     useEffect(() => {
         if(user){
@@ -140,10 +139,10 @@ const ProductCard = ({product} : {product : product}) => {
                     </div>
                     <div className='col-span-3' >
                         <h1 className="text-xl font-medium" >{product?.name}</h1>
-                        <button onClick={()=>{
+                        {/* <button onClick={()=>{
                             console.log("hello")
                             debouncedFunction();
-                        }} >click here</button>
+                        }} >click here</button> */}
                         <div className="flex items-center gap-3 mt-3" >
                            <ReactStars
                                 count={5}
@@ -170,24 +169,26 @@ const ProductCard = ({product} : {product : product}) => {
                         <div className="flex gap-5 items-center" >
                             <div>
                                 <div className="mt-5" >
-                                    <button onClick={()=> router.push('/checkout/'+ product?.id) } className="bg-blue-600 text-white px-5 py-2 rounded-md" >Buy Now</button>
+                                    <button onClick={()=> router.push('/checkout/'+ product?._id) } className="bg-blue-600 text-white px-5 py-2 rounded-md" >Buy Now</button>
                                 </div>
                             </div>
                             <div className="flex gap-5 items-center" >
                                 {
-                                    isItemExist && <div className="mt-5" >
+                                    isItemExist && 
+                                    <div className="mt-5" >
                                         <BtnUnderline onClick={()=> router.push('/cart')} >Go to cart <IoCartOutline size={20} className='inline ml-1' /></BtnUnderline>
-                                    </div> || <div className="mt-5" >
-                                        <BtnUnderline onClick={()=> addItem(product?.id)} >Add to Cart <IoCartOutline size={20} className='inline ml-1' /></BtnUnderline>
+                                    </div> || 
+                                    <div className="mt-5" >
+                                        <BtnUnderline onClick={()=> addItem(product?._id)} >Add to Cart <IoCartOutline size={20} className='inline ml-1' /></BtnUnderline>
                                     </div>
                                 }
                                 {
                                     data && data.length > 0 && data[0].product.id === product?.id &&
                                     <div className="mt-5" >
-                                        <IoHeartSharp onClick={()=> deletewishlist(data[0])} size={23} className="cursor-pointer text-red-400" />
+                                        <IoHeartSharp onClick={()=> deletewishlist(data[0].product)} size={23} className="cursor-pointer text-red-400" />
                                         {/* <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button> */}
                                     </div> || <div className="mt-5" >
-                                        <IoHeartOutline onClick={()=> addIteminwish(product?.id)} size={23} className="cursor-pointer text-red-400" />
+                                        <IoHeartOutline onClick={()=> addIteminwish(product?._id)} size={23} className="cursor-pointer text-red-400" />
                                         {/* <button onClick={()=> addIteminwish(product?.id)} className="bg-red-600 text-white px-5 py-2 rounded-md" >Add to wishlist</button> */}
                                     </div>
                                 }
@@ -242,7 +243,6 @@ export async function getStaticProps({params} : any) {
 
     const productData = await getProductByProductName(product);
 
-    // const prisma = new PrismaClient();
     // const productData = await prisma.product.findUnique({
     //     where: {
     //         name: product
@@ -270,7 +270,6 @@ export async function getStaticProps({params} : any) {
 }
 
 export async function getStaticPaths() {
-    const prisma = new PrismaClient();
     // const products = await prisma.product.findMany();
     // const categories = await prisma.category.findMany();
 

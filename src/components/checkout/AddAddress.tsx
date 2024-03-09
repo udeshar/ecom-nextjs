@@ -12,14 +12,14 @@ const AddAddress = ({setAllAddresses, setSelectedAddress} : any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const data = {
-            firstname: formData.get('firstname'),
-            lastname: formData.get('lastname'),
+            firstName: formData.get('firstname'),
+            lastName: formData.get('lastname'),
             address: formData.get('address'),
             city: formData.get('city'),
             state: formData.get('state'),
             zip: formData.get('zip')
         }
-        if(data.firstname && data.lastname && data.address && data.city && data.state && data.zip){
+        if(data.firstName && data.lastName && data.address && data.city && data.state && data.zip){
             console.log(data);
             addAddress(
                 data, 

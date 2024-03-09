@@ -7,6 +7,7 @@ const UserContext = createContext({
     login: (email, password, callback, onError) => {},
     logout: (callback) => {},
     getUser: () => {},
+    addresses : [],
     getAllAddresses: (callback, onError) => {},
     addAddress: (address, callback, onError) => {},
     updateAddress: (address, callback, onError) => {},
@@ -23,6 +24,7 @@ export const useUserContext = () => {
 export const UserProvider = ({ children }) => {
 
     const [user, setUser] = useState(null);
+    const [addresses, setAddresses] = useState([]);
 
     async function login(email, password, callback, onError){
         try {
@@ -98,6 +100,7 @@ export const UserProvider = ({ children }) => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             })
             .then(response => response.json())
@@ -105,7 +108,8 @@ export const UserProvider = ({ children }) => {
                 if(data?.error){
                     onError(data?.message)
                 } else{
-                    callback(data);
+                    callback && callback(data);
+                    setAddresses(data);
                 }
             })
         }
@@ -120,6 +124,7 @@ export const UserProvider = ({ children }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
                 },
                 body: JSON.stringify(address),
             })
@@ -142,6 +147,7 @@ export const UserProvider = ({ children }) => {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
                 },
             })
             .then(response => response.json())
@@ -163,6 +169,7 @@ export const UserProvider = ({ children }) => {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
                 },
                 body: JSON.stringify(address),
             })
@@ -185,6 +192,7 @@ export const UserProvider = ({ children }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
                 },
                 body: JSON.stringify(order),
             })
@@ -232,15 +240,15 @@ export const UserProvider = ({ children }) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token') || '',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token')) || '',
                 },
             })
-            .then(response => response.json())
-            .then(data => {
-                if(data?.error){
-                    onError(data?.message)
-                } else{
-                    callback(data);
+            .then(response => {
+                if(response.status === 401){
+                    onError();
+                }
+                else{
+                    callback();
                 }
             })
         }
@@ -258,6 +266,7 @@ export const UserProvider = ({ children }) => {
 
     const values = {
         user,
+        addresses,
         setUser : getUser,
         login,
         logout,

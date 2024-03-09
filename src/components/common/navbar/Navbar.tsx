@@ -18,7 +18,6 @@ const Navbar: React.FC = () => {
     const router = useRouter();
     useEffect(() => {
         getUser();
-        // getCartItems();
     }, [])
     
 

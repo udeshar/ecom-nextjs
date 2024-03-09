@@ -72,7 +72,7 @@ const EditAddressModal = ({
                     <div>
                         <button type='button' onClick={()=> {
                             deleteAddress(
-                                address.id, 
+                                address._id, 
                                 (dataa:any)=>{
                                     setAllAddresses(dataa);
                                     showToast('Address deleted successfully', 'Success');

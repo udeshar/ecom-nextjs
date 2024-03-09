@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import AddAddress from '@/components/checkout/AddAddress'
 import AddressCard from '@/components/checkout/AddressCard'
 import PaymentMethodCard from '@/components/checkout/PaymentMethodCard'
@@ -9,7 +9,6 @@ import EditAddressModal from '@/components/checkout/EditAddressModal'
 import ConfirmationPopup from '@/components/common/popups/ConfirmationPopup'
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/router';
-import { address } from '@prisma/client'
 
 const paymentMethod = [
     {
@@ -33,21 +32,26 @@ const paymentMethod = [
 
 ]
 
-const CheckoutMain = ({addresses, items} : any) => {
+const CheckoutMain = ({items} : any) => {
 
+    const { placeOrder, addresses } = useUserContext();
     const [allAddresses, setAllAddresses] = useState(addresses);
     const [openModal, setOpenModal] = useState(false);
     const [openConfirmationPopup, setOpenConfirmationPopup] = useState(false);
     const [editableAddress, setEditableAddress] = useState(null);
-    const [selectedAddress, setSelectedAddress] = useState<address>(addresses && addresses[0]);
+    const [selectedAddress, setSelectedAddress] = useState<any>(addresses && addresses[0]);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(paymentMethod[0]);
     // const { items } = useCartContext();
-    const { placeOrder } = useUserContext();
     const { showToast } = useAppContext();
 
     const router = useRouter();
 
     const totalPrice = items.reduce((acc : any, item : any) => acc + (item.product.price * item.quantity), 0);
+
+    useEffect(() => {
+        setAllAddresses(addresses);
+        setSelectedAddress(addresses && addresses[0]);
+    }, [addresses])
 
     const handleSubmit = async () => {
         if(!selectedAddress){
@@ -61,12 +65,12 @@ const CheckoutMain = ({addresses, items} : any) => {
         const orderItems = items.map((item : any) => {
             return {
                 id : uuidv4(),
-                productId: item.product.id,
+                productId: item.product._id,
                 quantity: item.quantity
             }
         })
         const order = {
-            addressId: selectedAddress.id,
+            addressId: selectedAddress._id,
             paymentMethod: selectedPaymentMethod.title,
             orderItems,
             total: totalPrice + 40

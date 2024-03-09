@@ -12,6 +12,7 @@ const ProductContext = createContext({
     getProductByQuery : (query) => {},
     categoryProducts : [],
     getProductByName : (name) => {},
+    getProductById : (id, callback) => {}
 });
 
 export const useProductsContext = () => {
@@ -94,6 +95,27 @@ export const ProductProvider = ({ children }) => {
         }
     }
 
+    async function getProductById(id, callback) {
+        setSingleProduct({});
+        try {
+            const response = await fetch(API_URL + '/api/product/' + id, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            const data = await response.json();
+            if(!data.error)
+                callback(data);
+            else {
+                showToast(data?.message, 'Error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Error in getting product', 'Error');
+        }
+    }
+
     // useEffect(() => {
         // const token = localStorage.getItem('token');
         // if(token){
@@ -111,7 +133,8 @@ export const ProductProvider = ({ children }) => {
         bestSeller,
         offered,
         getProductByName,
-        singleProduct
+        singleProduct,
+        getProductById
     };
 
     return (

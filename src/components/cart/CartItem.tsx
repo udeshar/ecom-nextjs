@@ -24,12 +24,12 @@ const CartItem = ({item} : {item : any}) => {
             } else {
                 setQty((prev)=> prev-1)
             }
-            updatecart({id: item.id, quantity : qty + (operation === "+" ? 1 : -1)});
+            updatecart({id: item.product._id, quantity : qty + (operation === "+" ? 1 : -1)});
         }
     }
 
     const removeItem = () => {
-        updatecart({id: item.id, quantity : 0});
+        updatecart({id: item.product._id, quantity : 0});
         setOpenModal(false);
         setQty(0);
     }

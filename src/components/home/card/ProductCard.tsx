@@ -84,7 +84,7 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
             {
               data2 && data2.length > 0 && data2[0].product.id === product.id && 
               <BtnUnderline className="" onClick={()=> removeItem(data2[0], 0)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Remove from cart</p></div></BtnUnderline> ||
-              <BtnUnderline className="" onClick={()=> addItem(product.id)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
+              <BtnUnderline className="" onClick={()=> addItem(product._id)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
             }
               {/* {isFav ? <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
                 console.log(product.id);
@@ -98,11 +98,10 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
               {
                 data && data.length > 0 && data[0].product.id === product.id &&
                 <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
-                  console.log(data[0].id);
-                  deletewishlist(data[0]);
+                  deletewishlist(data[0].product);
                 }} /> ||
                 <IoHeartOutline size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
-                  addIteminwish(product.id);
+                  addIteminwish(product._id);
                 }} />
               }
           </>
