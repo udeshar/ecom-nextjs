@@ -9,7 +9,7 @@ const Review = ({review} : any) => {
         <h1 className="font-medium text-md my-1">{review.user.email.split('@')[0]}</h1>
         <p className="font-normal text-sm my-1">{review.user.email}</p>
         <p className="text-gray-500 text-sm font-light mt-4">
-          {review.comment}
+          {review.review}
         </p>
         <div className="flex items-center gap-3">
           <ReactStars
