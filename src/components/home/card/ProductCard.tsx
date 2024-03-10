@@ -50,8 +50,8 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
     })
   }
 
-  const data:any = wishlistItems.filter((item : any) => item.product.id === product.id)
-  const data2:any = cartItems.filter((item : any) => item.product.id === product.id)
+  const data:any = wishlistItems.filter((item : any) => item.product._id === product._id)
+  const data2:any = cartItems.filter((item : any) => item.product._id === product._id)
 
   return (
     <div className={`relative overflow-hidden product-card transition mt-1 sm:mt-3 col-span-2 sm:col-span-2 md:col-span-2 lg:col-span-1 ` + styles.productcard} >
@@ -68,7 +68,7 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
           <h2 className="font-bold text-sm sm:text-md ">{product.name}</h2>
           <ReactStars
             count={5}
-            value={product.rating}
+            value={product.ratings}
             onChange={ratingChanged}
             size={18}
             activeColor="#ffd700"
@@ -82,7 +82,7 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
           user === "User" &&
           <>
             {
-              data2 && data2.length > 0 && data2[0].product.id === product.id && 
+              data2 && data2.length > 0 && data2[0].product._id === product._id && 
               <BtnUnderline className="" onClick={()=> removeItem(data2[0], 0)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Remove from cart</p></div></BtnUnderline> ||
               <BtnUnderline className="" onClick={()=> addItem(product._id)} width={"w-12"} ><div className="flex gap-2 items-center" ><IoCartOutline size={20} /> <p>Add to Cart</p></div></BtnUnderline>
             }
@@ -96,7 +96,7 @@ const ProductCard = ({product, user, categoryName} : {product : any, user : "Adm
                 // setIsFav(!isFav);
               }} />} */}
               {
-                data && data.length > 0 && data[0].product.id === product.id &&
+                data && data.length > 0 && data[0].product._id === product._id &&
                 <IoHeartSharp size={22} className={"cursor-pointer text-red-400"} onClick={()=>{
                   deletewishlist(data[0].product);
                 }} /> ||

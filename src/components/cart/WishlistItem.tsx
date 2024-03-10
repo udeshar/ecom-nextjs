@@ -39,8 +39,8 @@ const WishlistItem = ({item} : {item : any}) => {
                 <div className="flex justify-end items-center gap-3 md:gap-5" >
                     <Button color="red" onClick={() => setOpenModal(true)} ><AiOutlineDelete size={22} /></Button>
                     {
-                        !(items && items.length > 0 && items.some((i : any) => i.product.id === item?.product?.id)) &&
-                        <Button color="green" onClick={() => addItem(item?.product?.id)} ><FaCartPlus size={22} /></Button>
+                        !(items && items.length > 0 && items.some((i : any) => i.product._id === item?.product?._id)) &&
+                        <Button color="green" onClick={() => addItem(item?.product?._id)} ><FaCartPlus size={22} /></Button>
                     }
                 </div>
             </div>

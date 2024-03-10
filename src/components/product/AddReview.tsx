@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import ReactStars from "react-rating-stars-component";
 import CustomTextarea from '../common/custom-input/CustomTextarea';
 import { revalidatePath } from 'next/cache';
+import { API_URL } from '@/helpers/constants';
 
 const AddReview = ({productid, callBack} : any) => {
 
@@ -16,13 +17,14 @@ const AddReview = ({productid, callBack} : any) => {
         }
         setError("");
         // API call
-        fetch(`/api/product/${productid}/review`, {
+        fetch(`${API_URL}/api/review/${productid}`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
             },
             body: JSON.stringify({
-                comment: review,
+                review,
                 rating
             })
         })

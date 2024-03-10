@@ -53,21 +53,6 @@ export const UserProvider = ({ children }) => {
 
     async function logout(callback){
         setUser(null);
-        fetch(API_URL + '/api/auth/logout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token') || '',
-            },
-            body: JSON.stringify({}),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data?.error){
-                console.log(data?.message)
-            } else{
-            }
-        })
         localStorage.removeItem('token');
         callback();
     }
@@ -81,9 +66,18 @@ export const UserProvider = ({ children }) => {
                     'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token') || ''),
                 },
             })
-            .then(response => response.json())
+            .then(response => {
+                if(response.status === 401){
+                    localStorage.removeItem('token');
+                    logout(()=>{});
+                    return
+                } else{
+                    return response.json()
+                }
+            })
             .then(data => {
                 if(data?.error){
+                    localStorage.removeItem('token');
                     logout(()=>{});
                 } else{
                     setUser(data);

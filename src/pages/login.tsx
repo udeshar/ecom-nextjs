@@ -24,7 +24,7 @@ const Login = () => {
             email, 
             password, 
             (user:any)=>{
-                if(user.role === "ADMIN") 
+                if(user.user.role === "Admin") 
                     router.push("/admin")
                 else{
                     getCartItems()

@@ -15,7 +15,7 @@ const CategoryProduct = ({products, user, categoryName} : IAdminProps) => {
           {
               products?.map((product : any) => {
                   return (
-                      <ProductCard key={product.id} product={product} user={user} categoryName={categoryName} />
+                      <ProductCard key={product._id} product={product} user={user} categoryName={categoryName} />
                   )
               })
           }

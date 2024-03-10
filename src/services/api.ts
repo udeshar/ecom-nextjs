@@ -30,3 +30,9 @@ export const getProductByProductName = async (name : string) => {
     const data = await res.json();
     return data;
 }
+
+export const getReviewsByProductId = async (id : string) => {
+    const res = await fetch(`${API_URL}/api/review/${id}`);
+    const data = await res.json();
+    return data;
+}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ToggleTheme from "../theme/ToggleTheme";
 import Link from "next/link";
 import { useUserContext } from "@/context/userContext";
@@ -7,11 +7,11 @@ import { useRouter } from "next/router";
 
 const AdminNavbar: React.FC = () => {
     const router = useRouter();
-    const {user, logout} = useUserContext();
+    const {user, logout, getUser} = useUserContext();
 
-    // useEffect(() => {
-    //     getUser();
-    // }, [])
+    useEffect(() => {
+        getUser();
+    }, [])
     
 
     return (

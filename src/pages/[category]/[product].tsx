@@ -10,16 +10,19 @@ import { useUserContext } from '@/context/userContext';
 import AddReview from '@/components/product/AddReview';
 import BtnUnderline from '@/components/common/custom-button/BtnUnderline';
 import { IoCartOutline, IoHeartOutline, IoHeartSharp  } from "react-icons/io5";
-import { getAllCategories, getAllProducts, getProductByProductName } from '@/services/api';
+import { getAllCategories, getAllProducts, getProductByProductName, getReviewsByProductId } from '@/services/api';
+import OverallRating from '@/components/product/OverallRating';
+import Review from '@/components/common/review/Review';
+import { API_URL } from '@/helpers/constants';
 
-const ProductCard = ({product} : {product : any}) => {
+const ProductCard = ({product, reviewsData} : {product : any, reviewsData : any}) => {
     const router = useRouter();
     const {addItem, items} = useCartContext();
     const { addIteminwish, deletewishlist, items : wishlistItems } = useWishlistContext();
     const {user} : {user : any} = useUserContext();
     const {category, product: productName} = router.query;
-    // const [reviews, setReviews] = useState<any>(reviewsData || []);
-    const [reviews, setReviews] = useState<any>([]);
+    const [reviews, setReviews] = useState<any>(reviewsData || []);
+    // const [reviews, setReviews] = useState<any>([]);
 
     const [alredyReviewed, setAlredyReviewed] = useState<boolean>(false);
 
@@ -27,7 +30,7 @@ const ProductCard = ({product} : {product : any}) => {
     const data:any = wishlistItems?.filter((item : any) => item.product._id === product._id)
 
     const getReviews = async  () => {
-        fetch(`/api/product/${product.id}/review`,{
+        fetch(`${API_URL}/api/review/${product._id}`,{
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -117,7 +120,7 @@ const ProductCard = ({product} : {product : any}) => {
     useEffect(() => {
         if(user){
             const alredyReviewed = reviews.some((review : any) => {
-                if(review.userId == (user as any).id){
+                if(review.userId == (user as any)._id){
                     return true;
                 }
                 return false;
@@ -146,7 +149,7 @@ const ProductCard = ({product} : {product : any}) => {
                         <div className="flex items-center gap-3 mt-3" >
                            <ReactStars
                                 count={5}
-                                value={product?.rating}
+                                value={product?.ratings}
                                 onChange={()=>{}}
                                 size={25}
                                 activeColor="#ffd700"
@@ -183,7 +186,7 @@ const ProductCard = ({product} : {product : any}) => {
                                     </div>
                                 }
                                 {
-                                    data && data.length > 0 && data[0].product.id === product?.id &&
+                                    data && data.length > 0 && data[0].product._id === product?._id &&
                                     <div className="mt-5" >
                                         <IoHeartSharp onClick={()=> deletewishlist(data[0].product)} size={23} className="cursor-pointer text-red-400" />
                                         {/* <button onClick={()=> deletewishlist(data[0])} className="bg-red-600 text-white px-5 py-2 rounded-md" >Remove from wishlist</button> */}
@@ -204,11 +207,11 @@ const ProductCard = ({product} : {product : any}) => {
                                 !alredyReviewed &&
                                 <>
                                     <h1 className="font-medium text-2xl" >Reviews</h1>
-                                    <AddReview productid={product.id} callBack={getReviews} /> 
+                                    <AddReview productid={product._id} callBack={getReviews} /> 
                                 </>
                             )
                         }
-                        {/* {
+                        {
                             reviews.length > 0 &&
                             <>
                                 <div className="grid grid-cols-1 md:grid-cols-5 gap-0 md:gap-8 my-10 mt-10" >
@@ -225,7 +228,7 @@ const ProductCard = ({product} : {product : any}) => {
                                     </div>
                                 </div>
                             </>
-                        } */}
+                        }
                         
                     </div>
                 </div>
@@ -242,27 +245,15 @@ export async function getStaticProps({params} : any) {
     const product = params.product;
 
     const productData = await getProductByProductName(product);
+    const reviews = await getReviewsByProductId(productData._id);
 
-    // const productData = await prisma.product.findUnique({
-    //     where: {
-    //         name: product
-    //     }
-    // });
-
-    // const reviews = await prisma.review.findMany({
-    //     where: {
-    //         productId: productData?.id
-    //     },
-    //     include: {
-    //         user: true
-    //     }
-    // });
-
-    // await prisma.$disconnect();
+    console.log(productData, "productData")
+    console.log(reviews, "reviews")
 
     return {
         props: {
-            product : productData
+            product : productData,
+            reviewsData : reviews
             // reviewsData : JSON.parse(JSON.stringify(reviews))
         },
         revalidate: 30
@@ -270,8 +261,6 @@ export async function getStaticProps({params} : any) {
 }
 
 export async function getStaticPaths() {
-    // const products = await prisma.product.findMany();
-    // const categories = await prisma.category.findMany();
 
     const products = await getAllProducts();
     const categories = await getAllCategories();
@@ -279,7 +268,7 @@ export async function getStaticPaths() {
     const paths = products.map((product : any) => {
         return {
             params: {
-                category: categories.find((category : any) => category.id === product.categoryId)?.name,
+                category: categories.find((category : any) => category._id === product.category._id)?.name,
                 product: product.name
             }
         }

@@ -30,7 +30,7 @@ const Cart = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5" >
                 {
                     items.length > 0 ? items.map((item, index) => (
-                        <CartItem key={(item as any).id} item={item} />
+                        <CartItem key={(item as any)._id} item={item} />
                     )) : <h1 className="text-2xl text-center">No items in cart</h1>
                 }
             </div>

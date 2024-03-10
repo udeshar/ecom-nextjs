@@ -112,7 +112,7 @@ const ManageCategory = () => {
     };
 
     const deleteCategory = () => {
-        fetch(API_URL + `/api/category/${category.id}`, {
+        fetch(API_URL + `/api/category/${category._id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -121,6 +121,10 @@ const ManageCategory = () => {
         })
         .then((res) => res.json())
         .then((data) => {
+            if(data.error){
+                setError(data.message);
+                return;
+            }
             console.log(data);
             router.push('/admin');
         })

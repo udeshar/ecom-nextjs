@@ -1,10 +1,9 @@
 import React from "react";
 import CategoryCardAdmin from "./CategoryCardAdmin";
 import AddCategoryCard from "./AddCategoryCard";
-import { category } from "@prisma/client";
 
 interface IAdminProps {
-  categories: category[]
+  categories: any
 }
 
 const CategoriesAdmin = ({categories} : IAdminProps) => {
@@ -18,8 +17,8 @@ const CategoriesAdmin = ({categories} : IAdminProps) => {
       <hr className="mt-5 dark:border-slate-600 border-slate-100 border-t" />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-8 my-5">
         {
-          categories.map((category) => {
-            return <CategoryCardAdmin key={category.id} category={category} />
+          categories.map((category : any) => {
+            return <CategoryCardAdmin key={category._id} category={category} />
           })
         }
         {/* <CategoryCardAdmin />
