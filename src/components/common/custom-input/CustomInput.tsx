@@ -12,10 +12,12 @@ type props = {
     required? : boolean,
     onChange? : (e: any)=>void,
     ref? : React.LegacyRef<HTMLInputElement> | undefined,
-    isChecked? : boolean
+    isChecked? : boolean,
+    onBlur? : (e: any)=>void,
+    onFocus? : (e: any)=>void
 }
 
-const CustomInput = ({type, name, id, value, label, className, wrapperClass, placeholder, required, onChange, ref, isChecked} : props) => {
+const CustomInput = ({type, name, id, value, label, className, wrapperClass, placeholder, required, onChange, ref, isChecked, onBlur, onFocus} : props) => {
   return <div className={wrapperClass} >
     {
         label &&
@@ -32,6 +34,8 @@ const CustomInput = ({type, name, id, value, label, className, wrapperClass, pla
         onChange={onChange}
         ref={ref}
         checked={isChecked}
+        onBlur={onBlur && onBlur}
+        onFocus={onFocus && onFocus}
     />
   </div>;
 };
